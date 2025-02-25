@@ -1,0 +1,30 @@
+# nonk8s
+apiVersion: "backstage.io/v1alpha1"
+kind: "Component"
+metadata:
+  name: "meldingstjeneste"
+  tags:
+  - "public"
+spec:
+  type: "service"
+  lifecycle: "production"
+  owner: "egenregistrering"
+  system: "egenreg"
+  providesApis:
+  - "meldingstjeneste-api"
+---
+apiVersion: "backstage.io/v1alpha1"
+kind: "API"
+metadata:
+  name: "meldingstjeneste-api"
+  tags:
+  - "public"
+spec:
+  type: "openapi"
+  lifecycle: "production"
+  owner: "egenregistrering"
+  definition: |
+    openapi: "3.0.0"
+    info:
+        title: meldingstjeneste API
+    paths:
