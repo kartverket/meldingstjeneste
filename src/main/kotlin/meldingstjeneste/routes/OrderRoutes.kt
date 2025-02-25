@@ -1,0 +1,228 @@
+package meldingstjeneste.routes
+
+import io.github.smiley4.ktorswaggerui.dsl.routes.OpenApiRoute
+import io.github.smiley4.ktorswaggerui.dsl.routing.get
+import io.github.smiley4.ktorswaggerui.dsl.routing.post
+import io.ktor.client.call.*
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import meldingstjeneste.model.*
+import meldingstjeneste.model.OrderConfirmation
+import meldingstjeneste.model.OrderRequest
+import meldingstjeneste.model.OrderResponse
+import meldingstjeneste.model.PaginationOrders
+import meldingstjeneste.service.OrderService
+import java.time.ZonedDateTime
+
+fun Route.orderRoutes(orderService: OrderService) {
+    post("/orders", ordersDoc) {
+        val request = call.receive<OrderRequest>()
+        val response = orderService.sendOrder(request)
+        val host = call.request.host()
+
+        if (response.status.isSuccess()) {
+            val body = response.body<AltinnOrderConfirmation>()
+            val orderConfirmation = orderService.createOrderConfirmation(body, request, host)
+            call.respond(response.status, orderConfirmation)
+        } else {
+            call.respond(response)
+        }
+    }
+
+    get("/orders/{id}", statusDoc) {
+        val orderId = call.parameters["id"].toString()
+        val status = orderService.getOrderStatus(orderId)
+        call.respond(HttpStatusCode.OK, status)
+    }
+
+    get("/orders", paginationDoc) {
+        val type = call.request.queryParameters["type"]
+        val sendersReference =
+            call.request.queryParameters["sendersReference"] ?: throw IllegalArgumentException("'sendersReference' is required")
+        val index =
+            call.request.queryParameters["index"]!!.toIntOrNull()
+                ?: throw IllegalArgumentException("'index' is required and should be an integer")
+        val response = orderService.paginateOrders(sendersReference = sendersReference, orderType = type, index = index)
+        call.respond(HttpStatusCode.OK, response)
+    }
+
+    get("/orders/ids/{sendersReference}", orderIdsDoc) {
+        val sendersReference = call.parameters["sendersReference"] ?: throw IllegalArgumentException("'sendersReference' is required")
+        val response = orderService.getAltinnOrders(sendersReference = sendersReference)
+
+        if (response.status.isSuccess()) {
+            val body = response.body<AltinnSendersReferenceResponse>()
+            val orderInfoSorted = orderService.sortOrdersByRequestedSendTime(body.orders)
+            val orderIds = orderInfoSorted?.map { it.id }
+            call.respond(response.status, orderIds ?: emptyList())
+        } else {
+            call.respond(response)
+        }
+    }
+}
+
+private val ordersDoc: OpenApiRoute.() -> Unit = {
+    tags("Varslinger")
+    summary = "Send varsel til en liste med fødselsnummer"
+    description =
+        "Bestill utsending av varsler til én eller flere mottakere basert på fødselsnummer. \n\n" +
+        "Endepunktet benytter Altinns varslingstjeneste til utsending. Denne tjenesten henter ut den digitale kontaktinformasjonen til " +
+        "mottakerne i [Kontakt- og reservasjonsregisteret](https://eid.difi.no/nb/kontakt-og-reservasjonsregisteret). " +
+        "Pass derfor på at bruksområdet ditt går inn under Udirs rettninslinjer for lovpålagt eller valgrfri bruk av KRR."
+    request {
+        body<OrderRequest> {
+            description =
+                "Data som kreves for å opprette en ordre: \n" +
+                "- _nationalIdentityNumbers_: Mottakerne som skal varsles. Fødselsnummer må være på 11 siffer.\n" +
+                "- `smsTemplate`: Tekst for varsel på SMS. Det er ikke tillatt med klikkbare elementer som lenker og e-post.\n" +
+                "- `emailTemplate`: Emne og tekst for varsel sendt på e-post. Det er ikke tillatt med klikkbare elementer \n" +
+                "- `notificationChannel`: Hvilken kanal varselet skal sendes på." +
+                "Velger du eksplisitt e-post eller SMS, vil vi kun forsøke å nå mottakere via den valgte kanalen." +
+                "His mottaker mangler kontaktinformasjon for denne kanalen i KRR, vil ikke varselet bli sendt." +
+                "Velger du en foretrukket kanal, vil varselet sendes på den foretrukne kanalen hvis kontaktinformasjon er tilgjengelig. " +
+                "Hvis ikke, forsøker vi å sende via den andre kanalen. \n" +
+                "- `requestedSendTime`: Ønsket tidspunkt for utsending. Default er umiddelbar utsending. \n" +
+                "- `sendersReference`: Unik referanse oppgitt av avsenderen for sporing og historikk. " +
+                "Denne trengs for å kunne hente ut alle ordre som er sendt fra samme avsender." +
+                "Dersom du ønsker historikk bør du derfor bruke samme referanse for alle ordre som går ut fra samme tjeneste"
+            required = true
+            example("Eksempel-ordre") {
+                value =
+                    OrderRequest(
+                        nationalIdentityNumbers = listOf("12345678901", "10987654321"),
+                        emailTemplate =
+                            EmailTemplate(
+                                body = "Hei, dette er en testmelding fra Kartverket. Logg inn på Kartverket med din bruker for å lese den.",
+                                subject = "Nytt varsel fra Kartverket",
+                            ),
+                        smsTemplate = SmsTemplate("Hei, dette er en testmelding fra Kartverket."),
+                        notificationChannel = NotificationChannel.SmsPreferred,
+                        requestedSendTime = ZonedDateTime.parse("2023-10-11T13:45:00+02:00"),
+                        sendersReference = "Kartverket_teamnavn_applikasjonsnavn",
+                    )
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.Accepted) {
+            description = "Bestillingen er mottatt og behandles av Altinn."
+            "- `id`: En unik ID for bestillingen som kan brukes til å spore statusen til ordren og alle dens varsler.\n" +
+                "- `recipientLookup`: Informasjon om statusen for initielt mottakeroppslag i KRR. " +
+                "Returnere en liste over mottakere som er gyldige, reserverte eller mangler kontaktinformasjon.\n" +
+                "- `requestedSendTime`: Tidspunktet for utsending av varsel, i ISO 8601-format.\n" +
+                "- `orderStatus`: Status for bestillingen, som ved opprettelse kan være 'Scheduled' eller 'Processing'.\n" +
+                "- `statusLink`: En lenke for å sjekke statusen til ordren."
+            body<OrderConfirmation> {
+                required = true
+            }
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = "Feil ved forespørelen. Dette kan skyldes ugyldige ID-numre eller feil format på forespørselen."
+        }
+        code(HttpStatusCode.InternalServerError) {
+            description =
+                "Intern serverfeil. Klarte ikke å opprette ordren. Dette kan skyldes feil i Altinns varslingstjeneste."
+        }
+    }
+}
+
+private val statusDoc: OpenApiRoute.() -> Unit = {
+    tags("Varslinger")
+    summary = "Hent status for en ordre"
+    description =
+        "Endepunkt for å hente ut detaljert informasjon om en ordre og status på alle dens varsler. Her kan du følge med på hvordan det går med varslene du bestilte."
+    request {
+        queryParameter<String>("id") {
+            description = "Ordre-id. Denne mottar du som respons ved opprettelse av en ordre."
+            required = true
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            description =
+                "Informasjon om ordren og status for utsending. " +
+                "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
+            body<OrderResponse> {
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description =
+                "Ordren ble ikke funnet."
+        }
+        code(HttpStatusCode.BadRequest) {
+            description =
+                "Feil ved forespørelen. Dette kan skyldes ugyldige ID-numre eller feil format på forespørselen."
+        }
+        code(HttpStatusCode.InternalServerError) {
+            description =
+                "Intern serverfeil. Dette kan skyldes feil i Altinns varslingstjeneste."
+        }
+    }
+}
+
+private val paginationDoc: OpenApiRoute.() -> Unit = {
+    tags("Varslinger")
+    summary = "Hent en paginert liste med ordre og deres status"
+    description =
+        "Paginert endepunkt for å hente ut alle ordre som er sendt fra en spesifikk avsender. " +
+        "Endepunktet returnerer også overordnet status for hver ordre " +
+        "slik at du enkelt får oversikt over hvordan det har gått med de ulike."
+    request {
+        queryParameter<String>("type") {
+            description =
+                "Hent ut enten aktive eller planlagte ordre. Gyldige verdier er 'active' eller 'planned'. " +
+                "Hvis du ikke spesifiserer type vil vi returnere begge typer sortert på dato lengst fram i tid til eldst."
+            required = false
+        }
+        queryParameter<String>("sendersReference") {
+            description = "Avsenderen du vil hente ut ordrene for."
+            required = true
+        }
+        queryParameter<String>("index") {
+            description = "Hvilken index du vil hente ut ordre fra. Brukes for paginering."
+            required = true
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            description =
+                "Returnerer et objekt bestående av nødvendig informasjon for paginering, samt en liste med ordrene."
+            body<PaginationOrders> {
+            }
+        }
+        code(HttpStatusCode.BadRequest) {
+            description =
+                "Feil ved forespørelen. Dette kan skyldes ugyldige sendersReference eller feil format på forespørselen."
+        }
+        code(HttpStatusCode.InternalServerError) {
+            description =
+                "Intern serverfeil. Dette kan skyldes feil i Altinns varslingstjeneste."
+        }
+    }
+}
+
+private val orderIdsDoc: OpenApiRoute.() -> Unit = {
+    description =
+        "Endepunkt for å hente ut ordreid-er på en gitt sendersReference"
+    tags("Varslinger")
+    request {
+        queryParameter<String>("sendersReference") {
+            description = "Senders reference"
+            required = true
+        }
+    }
+    response {
+        default {
+            description = "Alle ordreid-er på en gitt sendersReference."
+            body<List<String>> {
+            }
+        }
+        code(HttpStatusCode.InternalServerError) {
+            description =
+                "Intern serverfeil. Dette kan skyldes feil i Altinns varslingstjeneste."
+        }
+    }
+}
