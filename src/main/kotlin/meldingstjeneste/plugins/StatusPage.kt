@@ -7,6 +7,7 @@ import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.util.*
+import io.ktor.utils.io.InternalAPI
 
 @OptIn(InternalAPI::class)
 fun Application.configureStatusPage() {
