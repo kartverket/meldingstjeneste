@@ -37,7 +37,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
     implementation("io.ktor:ktor-server-request-validation:$ktor_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
