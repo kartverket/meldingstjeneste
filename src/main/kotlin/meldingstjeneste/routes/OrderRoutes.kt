@@ -20,7 +20,8 @@ import java.time.ZonedDateTime
 fun Route.orderRoutes(orderService: OrderService) {
     post("/orders", ordersDoc) {
         val request = call.receive<OrderRequest>()
-        val response = orderService.sendOrder(request)
+        val requestWithUniqueIdentityNumbers = request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
+        val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
         val host = call.request.host()
 
         if (response.status.isSuccess()) {
