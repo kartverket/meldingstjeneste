@@ -33,8 +33,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
-        env:
-          GH_PACKAGES_PAT: ${{ secrets.GH_PACKAGES_PAT }}
 
       - name: Login to Github Container Registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
@@ -70,7 +68,7 @@ jobs:
     steps:
       - name: Fetch token
         uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0
-        id: octo-sts
+        id: octo-sts # TODO: Huske å legge inn et innslag i .github/chainguard i apps-repo
         with:
           scope: kartverket/egenreg-apps
           identity: meldingstjeneste

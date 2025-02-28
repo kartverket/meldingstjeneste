@@ -385,7 +385,6 @@ class OrderService {
 
     companion object {
         val BASE_URL = env["ALTINN_BASE_URL"]
-        val NOTIFICATIONS_BASE_URL = "/notifications/api/v1"
-        val NOTIFICATIONS_URL = "$BASE_URL$NOTIFICATIONS_BASE_URL"
+        val NOTIFICATIONS_URL = "$BASE_URL/notifications/api/v1"
     }
 }
