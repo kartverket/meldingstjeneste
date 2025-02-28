@@ -9,11 +9,17 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
+import io.micrometer.core.instrument.binder.logging.LogbackMetrics
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import meldingstjeneste.internal.Metrics
+import meldingstjeneste.internal.internalRoutes
 import meldingstjeneste.plugins.configureRouting
 import meldingstjeneste.plugins.configureStatusPage
 import meldingstjeneste.plugins.configureSwagger
@@ -34,6 +40,16 @@ val env =
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.module() {
+    val metricsRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    install(MicrometerMetrics) {
+        val logbackMetrics = LogbackMetrics()
+        logbackMetrics.bindTo(metricsRegistry)
+
+        Metrics.init(metricsRegistry)
+
+        registry = metricsRegistry
+    }
+
     install(ContentNegotiation) {
         json(
             Json {
@@ -56,4 +72,5 @@ fun Application.module() {
     configureRouting(orderService, proxyService)
     configureValidation()
     configureStatusPage()
+    internalRoutes(metricsRegistry)
 }

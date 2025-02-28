@@ -43,4 +43,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+    implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
 }
