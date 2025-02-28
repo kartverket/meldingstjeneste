@@ -8,6 +8,7 @@ import io.ktor.server.plugins.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import meldingstjeneste.env
 import meldingstjeneste.model.*
 import meldingstjeneste.plugins.ForbiddenException
 import meldingstjeneste.plugins.UnauthorizedException
@@ -18,22 +19,22 @@ class OrderService {
     private val client = HttpClientProvider.client
 
     private suspend fun postAltinnOrder(body: AltinnOrderRequest): HttpResponse =
-        client.post("$NOTIFICATIONS_BASE_URL/orders") {
+        client.post("$NOTIFICATIONS_URL/orders") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
 
     suspend fun getAltinnOrders(sendersReference: String): HttpResponse =
-        client.get("$NOTIFICATIONS_BASE_URL/orders?sendersReference=$sendersReference")
+        client.get("$NOTIFICATIONS_URL/orders?sendersReference=$sendersReference")
 
-    private suspend fun getAltinnOrderInfo(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_BASE_URL/orders/$orderId")
+    private suspend fun getAltinnOrderInfo(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_URL/orders/$orderId")
 
-    private suspend fun getAltinnOrderStatus(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_BASE_URL/orders/$orderId/status")
+    private suspend fun getAltinnOrderStatus(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_URL/orders/$orderId/status")
 
     private suspend fun getAltinnNotificationStatus(
         orderId: String,
         channelType: String,
-    ): HttpResponse = client.get("$NOTIFICATIONS_BASE_URL/orders/$orderId/notifications/$channelType")
+    ): HttpResponse = client.get("$NOTIFICATIONS_URL/orders/$orderId/notifications/$channelType")
 
     suspend fun sendOrder(orderRequest: OrderRequest): HttpResponse {
         val recipients = orderRequest.toRecipients()
@@ -142,8 +143,8 @@ class OrderService {
         requestedSendTime: ZonedDateTime,
         host: String,
     ): OrderConfirmation {
-        val baseUrl = if (host == "localhost") LOCAL_URL else CLOUD_URL
-        val statusLink = "$baseUrl/orders/$orderId"
+        val ingress = env["ingress"]
+        val statusLink =  "$ingress/orders/$orderId"
 
         val orderStatus: OrderStatus =
             if (checkIfDateIsLaterThanNow(requestedSendTime.toString())) {
@@ -383,9 +384,8 @@ class OrderService {
     private fun checkIfDateIsLaterThanNow(date: String): Boolean = ZonedDateTime.parse(date).isAfter(ZonedDateTime.now().plusMinutes(5))
 
     companion object {
-        const val BASE_URL = "https://platform.tt02.altinn.no"
-        const val NOTIFICATIONS_BASE_URL = "$BASE_URL/notifications/api/v1"
-        const val LOCAL_URL = "http://localhost:8080"
-        const val CLOUD_URL = "https://meldingstjeneste-483050985022.europe-north1.run.app"
+        val BASE_URL = env["ALTINN_BASE_URL"]
+        val NOTIFICATIONS_BASE_URL = "/notifications/api/v1"
+        val NOTIFICATIONS_URL = "$BASE_URL$NOTIFICATIONS_BASE_URL"
     }
 }

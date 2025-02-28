@@ -1,7 +1,6 @@
 package meldingstjeneste.plugins
 
 import io.github.smiley4.ktorswaggerui.SwaggerUI
-import io.ktor.client.request.*
 import io.ktor.server.application.*
 
 fun Application.configureSwagger() {

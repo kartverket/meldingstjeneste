@@ -129,14 +129,14 @@ class TokenService {
 
         when (apiProvider) {
             "notifications" -> {
-                clientId = env["clientId"]
-                jwkJson = env["jwk"]
+                clientId = env["ALTINN_CLIENT_ID"]
+                jwkJson = env["ALTINN_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
                 keyId = "kart_melding_test"
             }
             "krr" -> {
-                clientId = env["clientId_krr"]
-                jwkJson = env["jwk_krr"]
+                clientId = env["KRR_CLIENT_ID"]
+                jwkJson = env["KRR_JWK"]
                 claimValue = "krr:global/kontaktinformasjon.read krr:global/digitalpost.read"
                 keyId = "kart_melding_krr_test"
             }
