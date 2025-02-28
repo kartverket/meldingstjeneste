@@ -23,7 +23,7 @@ fun Application.configureRouting(
             openApiSpec()
         }
         get("/actuator/health") {
-            call.respond(HttpStatusCode.OK, "Health OK")
+            call.respondText( "OK")
         }
         orderRoutes(orderService)
         proxyRoutes(proxyService)
