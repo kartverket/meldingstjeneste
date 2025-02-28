@@ -4,7 +4,6 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
 import meldingstjeneste.model.NotificationChannel
 import meldingstjeneste.model.OrderRequest
-import java.awt.SystemColor.text
 import java.time.ZonedDateTime
 
 val nationalIdRegex = Regex("^[0-9]{11}\$")

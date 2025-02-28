@@ -12,8 +12,11 @@ permissions:
 
 jobs:
   build:
-    name: Build app
+    name: Docker build and push
     runs-on: ubuntu-latest
+
+    outputs:
+      image_url: ${{ steps.setOutput.outputs.image_url }}
 
     steps:
       - name: Checkout project sources
@@ -30,3 +33,55 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b # v6.2
+        with:
+          github_token: ${{ github.token }}
+
+      - name: Build docker and push
+        id: build
+        uses: docker/build-push-action@0adf9959216b96bec444f325f1e493d4aa344497 # v6.14.0
+        with:
+          context: .
+          push: true
+          tags: ${{ env.registry }}/${{ github.repository }}:${{ steps.tag_version.outputs.new_tag }},${{ env.registry }}/${{ github.repository }}:latest
+
+      - name: Set output with build values
+        id: setOutput
+        run: |
+          echo "image_url=${{ env.registry }}/${{ github.repository }}@${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
+
+
+  argo:
+    name: Update version in apps-repo
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch token
+        uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0
+        id: octo-sts # TODO: Huske å legge inn et innslag i .github/chainguard i apps-repo
+        with:
+          scope: kartverket/egenreg-apps
+          identity: meldingstjeneste
+      - name: Checkout apps-repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: kartverket/egenreg-apps
+          ref: main
+          token: ${{ steps.octo-sts.outputs.token }}
+      - name: Update version
+        run: |
+          echo "\"${{ needs.build.outputs.image_url }}\"" > "env/atkv3-dev/egenreg-main/${{ env.argo_version_file }}"
+          git config --global user.email "noreply@kartverket.no"
+          git config --global user.name "Egenreg CI"
+          git commit -am "Update Egenreg ${{ env.argo_version_file }}"
+          git push
