@@ -28,7 +28,9 @@ import meldingstjeneste.service.OrderService
 import meldingstjeneste.service.ProxyService
 
 fun main() {
-    embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::module)
+    val environment = env["ENVIRONMENT"]
+    val port = if (environment == "localhost") 8081 else 8080
+    embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }
 
