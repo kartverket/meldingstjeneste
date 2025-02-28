@@ -22,11 +22,10 @@ fun Route.orderRoutes(orderService: OrderService) {
         val request = call.receive<OrderRequest>()
         val requestWithUniqueIdentityNumbers = request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
         val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
-        val host = call.request.host()
 
         if (response.status.isSuccess()) {
             val body = response.body<AltinnOrderConfirmation>()
-            val orderConfirmation = orderService.createOrderConfirmation(body, request, host)
+            val orderConfirmation = orderService.createOrderConfirmation(body, request)
             call.respond(response.status, orderConfirmation)
         } else {
             call.respond(response)

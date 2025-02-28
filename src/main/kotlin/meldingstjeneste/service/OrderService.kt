@@ -131,20 +131,17 @@ class OrderService {
     fun createOrderConfirmation(
         altinnOrderConfirmation: AltinnOrderConfirmation,
         orderRequest: OrderRequest,
-        host: String,
     ): OrderConfirmation {
         val recipients = orderRequest.toRecipients()
         val sendTime = orderRequest.requestedSendTime?.withZoneSameInstant(ZoneOffset.UTC) ?: ZonedDateTime.now(ZoneOffset.UTC)
-        return altinnOrderConfirmation.toOrderConfirmation(recipients, sendTime, host)
+        return altinnOrderConfirmation.toOrderConfirmation(recipients, sendTime)
     }
 
     private fun AltinnOrderConfirmation.toOrderConfirmation(
         recipients: List<Recipient>,
         requestedSendTime: ZonedDateTime,
-        host: String,
     ): OrderConfirmation {
-        val ingress = env["INGRESS"]
-        val statusLink =  "$ingress/orders/$orderId"
+        val statusLink =  "orders/$orderId"
 
         val orderStatus: OrderStatus =
             if (checkIfDateIsLaterThanNow(requestedSendTime.toString())) {

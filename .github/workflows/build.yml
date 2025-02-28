@@ -10,6 +10,11 @@ permissions:
   contents: write
   packages: write
 
+env:
+  registry: ghcr.io
+  image_name: ${{ github.repository }}
+  argo_version_file: meldingstjeneste-version
+
 jobs:
   build:
     name: Docker build and push
