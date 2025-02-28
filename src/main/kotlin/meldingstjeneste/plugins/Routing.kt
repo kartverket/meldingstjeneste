@@ -22,7 +22,7 @@ fun Application.configureRouting(
         route("api.json") {
             openApiSpec()
         }
-        get("/health") {
+        get("/actuator/health") {
             call.respond(HttpStatusCode.OK, "Health OK")
         }
         orderRoutes(orderService)
