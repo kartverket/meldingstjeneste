@@ -143,7 +143,7 @@ class OrderService {
         requestedSendTime: ZonedDateTime,
         host: String,
     ): OrderConfirmation {
-        val ingress = env["ingress"]
+        val ingress = env["INGRESS"]
         val statusLink =  "$ingress/orders/$orderId"
 
         val orderStatus: OrderStatus =
