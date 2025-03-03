@@ -9,12 +9,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import meldingstjeneste.env
-import meldingstjeneste.logger
 import meldingstjeneste.model.*
 import meldingstjeneste.plugins.ForbiddenException
 import meldingstjeneste.plugins.UnauthorizedException
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 

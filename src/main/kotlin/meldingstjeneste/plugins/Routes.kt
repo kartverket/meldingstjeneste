@@ -2,10 +2,7 @@ package meldingstjeneste.plugins
 
 import io.github.smiley4.ktorswaggerui.routing.openApiSpec
 import io.github.smiley4.ktorswaggerui.routing.swaggerUI
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import meldingstjeneste.routes.orderRoutes
