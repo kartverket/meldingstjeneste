@@ -24,7 +24,6 @@ fun Route.orderRoutes(orderService: OrderService) {
         logger.info("Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}")
 
         val requestWithUniqueIdentityNumbers = request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
-        logger.info("Send order request from ${request.sendersReference} to Altinn")
         val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
 
         if (response.status.isSuccess()) {
@@ -41,7 +40,6 @@ fun Route.orderRoutes(orderService: OrderService) {
 
     get("/orders/{id}", statusDoc) {
         val orderId = call.parameters["id"].toString()
-        logger.info("Received request for order with id $orderId")
         val status = orderService.getOrderStatus(orderId)
         logger.info("Responding to request for order with ID $orderId: status ${status.orderStatus}")
 
@@ -57,7 +55,6 @@ fun Route.orderRoutes(orderService: OrderService) {
                 ?: throw IllegalArgumentException("'index' is required and should be an integer")
         logger.info("Received request for all orders from $sendersReference")
         val response = orderService.paginateOrders(sendersReference = sendersReference, orderType = type, index = index)
-        logger.info("Responding with all orders from $sendersReference: number of orders: ${response.numberOfOrders}")
         call.respond(HttpStatusCode.OK, response)
     }
 
