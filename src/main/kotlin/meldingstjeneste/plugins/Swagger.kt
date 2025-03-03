@@ -1,7 +1,8 @@
 package meldingstjeneste.plugins
 
 import io.github.smiley4.ktorswaggerui.SwaggerUI
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
 
 fun Application.configureSwagger() {
     install(SwaggerUI) {
@@ -19,9 +20,6 @@ fun Application.configureSwagger() {
             }
             tag("Varslinger") {
                 description = "Endepunkter for utsending av varsler via Altinns varslingstjeneste"
-            }
-            tag("Altinn Proxy") {
-                description = "Endepunkter for videresending av kall til Altinns varslingstjeneste"
             }
         }
     }

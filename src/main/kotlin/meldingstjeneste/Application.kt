@@ -25,7 +25,6 @@ import meldingstjeneste.plugins.configureStatusPage
 import meldingstjeneste.plugins.configureSwagger
 import meldingstjeneste.plugins.configureValidation
 import meldingstjeneste.service.OrderService
-import meldingstjeneste.service.ProxyService
 
 fun main() {
     val environment = env["ENVIRONMENT"]
@@ -69,9 +68,8 @@ fun Application.module() {
     }
 
     val orderService = OrderService() // Ensure this is initialized properly
-    val proxyService = ProxyService() // Ensure this is initialized properly
     configureSwagger()
-    configureRouting(orderService, proxyService)
+    configureRouting(orderService)
     configureValidation()
     configureStatusPage()
     internalRoutes(metricsRegistry)

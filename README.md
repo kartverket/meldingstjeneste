@@ -1,6 +1,6 @@
 ## Varslingstjeneste
-Tjenesten kobler seg opp mot [Altinns Notifications API](https://docs.altinn.studio/notifications/reference/api/) og
-eksponerer en del endepunkter som dette APIet har.
+Tjenesten kobler seg opp mot [Altinns Notifications API](https://docs.altinn.studio/notifications/reference/api/). 
+Endepunktene til tjenesten er bygget ovenpå dette API-et.
 
 ## API-dokumentasjon
 Dette prosjektet bruker Swagger for å dokumentere API-et.
