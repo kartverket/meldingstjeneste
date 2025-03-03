@@ -2,16 +2,17 @@ package meldingstjeneste.plugins
 
 import io.github.smiley4.ktorswaggerui.routing.openApiSpec
 import io.github.smiley4.ktorswaggerui.routing.swaggerUI
-import io.ktor.server.application.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import meldingstjeneste.routes.orderRoutes
-import meldingstjeneste.routes.proxyRoutes
 import meldingstjeneste.service.OrderService
-import meldingstjeneste.service.ProxyService
 
 fun Application.configureRouting(
     orderService: OrderService,
-    proxyService: ProxyService,
 ) {
     routing {
         route("swagger") {
@@ -21,6 +22,5 @@ fun Application.configureRouting(
             openApiSpec()
         }
         orderRoutes(orderService)
-        proxyRoutes(proxyService)
     }
 }
