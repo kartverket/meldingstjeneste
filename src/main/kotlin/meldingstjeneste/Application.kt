@@ -16,7 +16,6 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.micrometer.core.instrument.binder.logging.LogbackMetrics
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import meldingstjeneste.internal.Metrics
 import meldingstjeneste.internal.internalRoutes
@@ -25,6 +24,9 @@ import meldingstjeneste.plugins.configureStatusPage
 import meldingstjeneste.plugins.configureSwagger
 import meldingstjeneste.plugins.configureValidation
 import meldingstjeneste.service.OrderService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 
 fun main() {
     val environment = env["ENVIRONMENT"]
@@ -39,8 +41,11 @@ val env =
         systemProperties = true
     }
 
-@OptIn(ExperimentalSerializationApi::class)
+val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
+
 fun Application.module() {
+    logger.info("Starting app..")
+
     val metricsRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         val logbackMetrics = LogbackMetrics()

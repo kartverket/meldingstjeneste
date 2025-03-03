@@ -5,10 +5,11 @@ import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.ktor.client.call.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import meldingstjeneste.internal.Metrics
+import meldingstjeneste.logger
 import meldingstjeneste.model.*
 import meldingstjeneste.model.OrderConfirmation
 import meldingstjeneste.model.OrderRequest
@@ -20,14 +21,19 @@ import java.time.ZonedDateTime
 fun Route.orderRoutes(orderService: OrderService) {
     post("/orders", ordersDoc) {
         val request = call.receive<OrderRequest>()
+        logger.info("Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}")
+
         val requestWithUniqueIdentityNumbers = request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
         val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
 
         if (response.status.isSuccess()) {
+            Metrics.antallOrdreBestilt.increment()
             val body = response.body<AltinnOrderConfirmation>()
             val orderConfirmation = orderService.createOrderConfirmation(body, request)
+            logger.info("Successfully sent order request ${orderConfirmation.id} to Altinn")
             call.respond(response.status, orderConfirmation)
         } else {
+            logger.info("Order request to Altinn failed with status code: ${response.status.value}")
             call.respond(response)
         }
     }
@@ -35,6 +41,8 @@ fun Route.orderRoutes(orderService: OrderService) {
     get("/orders/{id}", statusDoc) {
         val orderId = call.parameters["id"].toString()
         val status = orderService.getOrderStatus(orderId)
+        logger.info("Responding to request for order with ID $orderId: status ${status.orderStatus}")
+
         call.respond(HttpStatusCode.OK, status)
     }
 
@@ -45,6 +53,7 @@ fun Route.orderRoutes(orderService: OrderService) {
         val index =
             call.request.queryParameters["index"]!!.toIntOrNull()
                 ?: throw IllegalArgumentException("'index' is required and should be an integer")
+        logger.info("Received request for all orders from $sendersReference")
         val response = orderService.paginateOrders(sendersReference = sendersReference, orderType = type, index = index)
         call.respond(HttpStatusCode.OK, response)
     }

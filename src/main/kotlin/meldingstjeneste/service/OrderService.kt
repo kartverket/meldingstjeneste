@@ -64,7 +64,6 @@ class OrderService {
                         ?: ZonedDateTime.now(ZoneOffset.UTC),
                 sendersReference = orderRequest.sendersReference,
             )
-
         return postAltinnOrder(body)
     }
 
