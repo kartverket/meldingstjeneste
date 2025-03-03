@@ -54,7 +54,7 @@ class OrderService {
                 smsTemplate =
                     orderRequest.smsTemplate?.let {
                         AltinnSmsTemplate(
-                            senderNumber = "Statens Kartverk",
+                            senderNumber = "Kartverket",
                             body = it.body,
                         )
                     },

@@ -61,7 +61,7 @@ fun Application.module() {
     }
 
     install(CORS) {
-        allowHost("localhost:3001")
+        allowHost(env["FRONTEND_INGRESS"].removePrefix("https://"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Put)
