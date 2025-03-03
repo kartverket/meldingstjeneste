@@ -8,6 +8,6 @@ object Metrics {
 
 
     fun init(registry: PrometheusMeterRegistry) {
-        antallOrdreBestilt = registry.counter("number_of_orders_sent")
+        antallOrdreBestilt = registry.counter("number_of_orders_requested")
     }
 }
