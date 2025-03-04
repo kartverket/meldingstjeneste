@@ -3,18 +3,25 @@ package meldingstjeneste.routes
 import io.github.smiley4.ktorswaggerui.dsl.routes.OpenApiRoute
 import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
-import io.ktor.client.call.*
-import io.ktor.http.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.github.smiley4.ktorswaggerui.dsl.routing.put
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
 import meldingstjeneste.internal.Metrics
 import meldingstjeneste.logger
-import meldingstjeneste.model.*
+import meldingstjeneste.model.AltinnOrderConfirmation
+import meldingstjeneste.model.AltinnOrderStatusResponse
+import meldingstjeneste.model.AltinnSendersReferenceResponse
+import meldingstjeneste.model.EmailTemplate
+import meldingstjeneste.model.NotificationChannel
 import meldingstjeneste.model.OrderConfirmation
 import meldingstjeneste.model.OrderRequest
 import meldingstjeneste.model.OrderResponse
 import meldingstjeneste.model.PaginationOrders
+import meldingstjeneste.model.SmsTemplate
 import meldingstjeneste.service.OrderService
 import java.time.ZonedDateTime
 
@@ -44,6 +51,20 @@ fun Route.orderRoutes(orderService: OrderService) {
         logger.info("Responding to request for order with ID $orderId: status ${status.orderStatus}")
 
         call.respond(HttpStatusCode.OK, status)
+    }
+
+    put("/orders/{id}/cancel", cancelDoc) {
+        val orderId = call.parameters["id"].toString()
+
+        val response = orderService.cancelOrder(orderId)
+        if (response.status.isSuccess()) {
+            val body = response.body<AltinnOrderStatusResponse>()
+            call.respond(response.status, "Ordre ble avbrutt. ID $orderId: status ${body.processingStatus}")
+        }
+        else if (response.status == HttpStatusCode.Conflict) {
+            call.respond(response.status, "Ordre kan ikke lengre avbrytes. (ID $orderId)")
+        }
+        call.respond(response.status)
     }
 
     get("/orders", paginationDoc) {
@@ -109,7 +130,7 @@ private val ordersDoc: OpenApiRoute.() -> Unit = {
                             ),
                         smsTemplate = SmsTemplate("Hei, dette er en testmelding fra Kartverket."),
                         notificationChannel = NotificationChannel.SmsPreferred,
-                        requestedSendTime = ZonedDateTime.parse("2023-10-11T13:45:00+02:00"),
+                        requestedSendTime = ZonedDateTime.now(),
                         sendersReference = "Kartverket_teamnavn_applikasjonsnavn",
                     )
             }
@@ -156,6 +177,42 @@ private val statusDoc: OpenApiRoute.() -> Unit = {
                 "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
             body<OrderResponse> {
             }
+        }
+        code(HttpStatusCode.NotFound) {
+            description =
+                "Ordren ble ikke funnet."
+        }
+        code(HttpStatusCode.BadRequest) {
+            description =
+                "Feil ved forespørelen. Dette kan skyldes ugyldige ID-numre eller feil format på forespørselen."
+        }
+        code(HttpStatusCode.InternalServerError) {
+            description =
+                "Intern serverfeil. Dette kan skyldes feil i Altinns varslingstjeneste."
+        }
+    }
+}
+
+private val cancelDoc: OpenApiRoute.() -> Unit = {
+    tags("Varslinger")
+    summary = "Avbryt en bestilt ordre"
+    description =
+        "Endepunkt for å avbryte en bestilt ordre. Hvis orderen har kommet for langt i sin prosess, vil den ikke kunne avbrytes."
+    request {
+        queryParameter<String>("id") {
+            description = "Ordre-id. Denne mottar du som respons ved opprettelse av en ordre."
+            required = true
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            description =
+                "Informasjon om ordren og status for utsending. " +
+                "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
+        }
+        code(HttpStatusCode.Conflict) {
+            description =
+                "Orderen kan ikke avsluttes fordi den er kommet for langt i prosessen."
         }
         code(HttpStatusCode.NotFound) {
             description =

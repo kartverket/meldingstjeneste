@@ -1,19 +1,61 @@
 package meldingstjeneste.service
 
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.server.plugins.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import meldingstjeneste.env
-import meldingstjeneste.model.*
+import meldingstjeneste.model.AltinnEmailTemplate
+import meldingstjeneste.model.AltinnNotificationResponse
+import meldingstjeneste.model.AltinnNotificationStatusResponse
+import meldingstjeneste.model.AltinnOrderConfirmation
+import meldingstjeneste.model.AltinnOrderRequest
+import meldingstjeneste.model.AltinnOrderResponse
+import meldingstjeneste.model.AltinnOrderStatusResponse
+import meldingstjeneste.model.AltinnSendersReferenceResponse
+import meldingstjeneste.model.AltinnSmsTemplate
+import meldingstjeneste.model.Notification
+import meldingstjeneste.model.NotificationChannel
+import meldingstjeneste.model.NotificationStatus
+import meldingstjeneste.model.Notifications
+import meldingstjeneste.model.NotificationsSummary
+import meldingstjeneste.model.OrderConfirmation
+import meldingstjeneste.model.OrderRequest
+import meldingstjeneste.model.OrderResponse
+import meldingstjeneste.model.OrderStatus
+import meldingstjeneste.model.PaginationOrder
+import meldingstjeneste.model.PaginationOrders
+import meldingstjeneste.model.Recipient
+import meldingstjeneste.model.RecipientLookup
+import meldingstjeneste.model.RecipientMapper
 import meldingstjeneste.plugins.ForbiddenException
 import meldingstjeneste.plugins.UnauthorizedException
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import kotlin.collections.List
+import kotlin.collections.all
+import kotlin.collections.emptyList
+import kotlin.collections.filter
+import kotlin.collections.flatMap
+import kotlin.collections.forEach
+import kotlin.collections.lastIndex
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.plus
+import kotlin.collections.sortedBy
+import kotlin.collections.sortedByDescending
 
 class OrderService {
     private val client = HttpClientProvider.client
@@ -30,6 +72,8 @@ class OrderService {
     private suspend fun getAltinnOrderInfo(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_URL/orders/$orderId")
 
     private suspend fun getAltinnOrderStatus(orderId: String): HttpResponse = client.get("$NOTIFICATIONS_URL/orders/$orderId/status")
+
+    private suspend fun cancelAltinnOrder(orderId: String): HttpResponse = client.put("$NOTIFICATIONS_URL/orders/$orderId/cancel")
 
     private suspend fun getAltinnNotificationStatus(
         orderId: String,
@@ -77,7 +121,7 @@ class OrderService {
             val altinnOrderStatusResponse = altinnOrderStatusDeferred.await()
             checkForException(listOf(altinnOrderInfoResponse, altinnOrderStatusResponse))
 
-            val altinnOrderInfo: AltinnOrderResponse = altinnOrderInfoResponse.body()
+            val altinnOrderInfo = altinnOrderInfoResponse.body<AltinnOrderResponse>()
 
             // Hent detaljer om alle varslene sendt per kanal, parallelt
             val channelTypes = altinnOrderInfo.notificationChannel.toChannelTypes()
@@ -88,12 +132,21 @@ class OrderService {
                     }.awaitAll()
             checkForException(altinnNotificationStatusResponses)
 
-            val altinnOrderStatus: AltinnOrderStatusResponse = altinnOrderStatusResponse.body()
+            val altinnOrderStatus = altinnOrderStatusResponse.body<AltinnOrderStatusResponse>()
             val altinnNotificationStatuses = altinnNotificationStatusResponses.map { it.body<AltinnNotificationStatusResponse>() }
 
             // Sett sammen informasjonen til en respons
             createOrderResponse(altinnOrderInfo, altinnOrderStatus, altinnNotificationStatuses)
         }
+
+    suspend fun cancelOrder(orderId: String): HttpResponse {
+        val altinnOrderCancelResponse = cancelAltinnOrder(orderId)
+        if (altinnOrderCancelResponse.status == HttpStatusCode.Conflict) {
+            return altinnOrderCancelResponse
+        }
+        checkForException(listOf(altinnOrderCancelResponse))
+        return altinnOrderCancelResponse
+    }
 
     private fun createOrderResponse(
         orderInfo: AltinnOrderResponse,
