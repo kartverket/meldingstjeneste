@@ -119,6 +119,7 @@ class TokenService {
 
             return accessToken
         } catch (e: Exception) {
+            logger.error("Failed to get access token from Maskinporten", e)
             throw e
         } finally {
             client.close() // Ensure the client is closed to free resources
@@ -137,9 +138,6 @@ class TokenService {
                 jwkJson = env["ALTINN_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
                 keyId = "kart_melding_test"
-
-                logger.info("clientId: ${clientId.take(3)}")
-                logger.info("jwkJson: ${jwkJson.take(3)}")
             }
             "krr" -> {
                 clientId = env["KRR_CLIENT_ID"]
@@ -154,7 +152,10 @@ class TokenService {
             throw NullPointerException("Client Id or JWK must be set in environment variables")
         }
 
-        val jwk: Jwk = Json.decodeFromString(jwkJson)
+        val jwk: Jwk = try {Json.decodeFromString(jwkJson)} catch (e: Exception) {
+            logger.error("Failed to parse JWK JSON: $jwkJson")
+            throw IllegalArgumentException("Failed to parse JWK JSON: $jwkJson")
+        }
 
         val modulus = jwk.n
         val privateExponent = jwk.d
