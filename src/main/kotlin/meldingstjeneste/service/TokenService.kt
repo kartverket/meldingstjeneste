@@ -15,6 +15,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import meldingstjeneste.env
 import meldingstjeneste.model.Jwk
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.interfaces.RSAPrivateKey
@@ -48,6 +50,8 @@ object TokenManager {
 }
 
 class TokenService {
+    val logger: Logger = LoggerFactory.getLogger(TokenService::class.java)
+
     suspend fun exchangeAccessToken(accessTokenMaskinporten: String): String {
         val client = HttpClient()
         try {
@@ -133,6 +137,9 @@ class TokenService {
                 jwkJson = env["ALTINN_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
                 keyId = "kart_melding_test"
+
+                logger.info("clientId: ${clientId.take(3)}")
+                logger.info("jwkJson: ${jwkJson.take(3)}")
             }
             "krr" -> {
                 clientId = env["KRR_CLIENT_ID"]
