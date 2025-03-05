@@ -59,9 +59,11 @@ fun Route.orderRoutes(orderService: OrderService) {
         val response = orderService.cancelOrder(orderId)
         if (response.status.isSuccess()) {
             val body = response.body<AltinnOrderStatusResponse>()
-            call.respond(response.status, "Ordre ble avbrutt. ID $orderId: status ${body.processingStatus}")
+            logger.info("Canceling order with ID $orderId")
+            call.respond(HttpStatusCode.OK, body)
         }
         else if (response.status == HttpStatusCode.Conflict) {
+            logger.info("Unable to cancel order with ID $orderId")
             call.respond(response.status, "Ordre kan ikke lengre avbrytes. (ID $orderId)")
         }
         call.respond(response.status)
@@ -209,6 +211,7 @@ private val cancelDoc: OpenApiRoute.() -> Unit = {
             description =
                 "Informasjon om ordren og status for utsending. " +
                 "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
+            body<AltinnOrderStatusResponse>{}
         }
         code(HttpStatusCode.Conflict) {
             description =
