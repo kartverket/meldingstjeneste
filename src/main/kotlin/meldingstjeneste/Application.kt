@@ -27,14 +27,6 @@ import meldingstjeneste.service.OrderService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
-fun main() {
-    val environment = env["ENVIRONMENT"]
-    val port = if (environment == "localhost") 8081 else 8080
-    embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
-
 val env =
     dotenv {
         ignoreIfMissing = true
@@ -42,6 +34,13 @@ val env =
     }
 
 val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
+val environment: String = env["ENVIRONMENT"]
+val port = if (environment == "localhost") 8081 else 8080
+
+fun main() {
+    embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
+        .start(wait = true)
+}
 
 fun Application.module() {
     logger.info("Starting app..")

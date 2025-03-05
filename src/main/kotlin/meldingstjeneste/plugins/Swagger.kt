@@ -3,6 +3,7 @@ package meldingstjeneste.plugins
 import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import meldingstjeneste.port
 
 fun Application.configureSwagger() {
     install(SwaggerUI) {
@@ -11,7 +12,7 @@ fun Application.configureSwagger() {
             version = "0.0.1"
         }
         server {
-            url = "http://localhost:8080"
+            url = "http://localhost:${port}"
             description = "Local"
         }
         tags {
