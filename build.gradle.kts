@@ -44,6 +44,6 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
 }
