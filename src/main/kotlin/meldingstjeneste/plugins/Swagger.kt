@@ -1,12 +1,12 @@
 package meldingstjeneste.plugins
 
-import io.github.smiley4.ktorswaggerui.SwaggerUI
+import io.github.smiley4.ktoropenapi.OpenApi
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import meldingstjeneste.port
 
 fun Application.configureSwagger() {
-    install(SwaggerUI) {
+    install(OpenApi) {
         info {
             title = "Kartverkets meldingstjeneste"
             version = "0.0.1"

@@ -23,7 +23,8 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.smiley4:ktor-swagger-ui:4.1.6")
+    implementation("io.github.smiley4:ktor-openapi:5.0.1")
+    implementation("io.github.smiley4:ktor-swagger-ui:5.0.1")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-webjars-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")

@@ -1,9 +1,9 @@
 package meldingstjeneste.routes
 
-import io.github.smiley4.ktorswaggerui.dsl.routes.OpenApiRoute
-import io.github.smiley4.ktorswaggerui.dsl.routing.get
-import io.github.smiley4.ktorswaggerui.dsl.routing.post
-import io.github.smiley4.ktorswaggerui.dsl.routing.put
+import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.get
+import io.github.smiley4.ktoropenapi.post
+import io.github.smiley4.ktoropenapi.put
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
@@ -96,7 +96,7 @@ fun Route.orderRoutes(orderService: OrderService) {
     }
 }
 
-private val ordersDoc: OpenApiRoute.() -> Unit = {
+private val ordersDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
     summary = "Send varsel til en liste med fødselsnummer"
     description =
@@ -161,7 +161,7 @@ private val ordersDoc: OpenApiRoute.() -> Unit = {
     }
 }
 
-private val statusDoc: OpenApiRoute.() -> Unit = {
+private val statusDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
     summary = "Hent status for en ordre"
     description =
@@ -195,7 +195,7 @@ private val statusDoc: OpenApiRoute.() -> Unit = {
     }
 }
 
-private val cancelDoc: OpenApiRoute.() -> Unit = {
+private val cancelDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
     summary = "Avbryt en bestilt ordre"
     description =
@@ -232,7 +232,7 @@ private val cancelDoc: OpenApiRoute.() -> Unit = {
     }
 }
 
-private val paginationDoc: OpenApiRoute.() -> Unit = {
+private val paginationDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
     summary = "Hent en paginert liste med ordre og deres status"
     description =
@@ -273,7 +273,7 @@ private val paginationDoc: OpenApiRoute.() -> Unit = {
     }
 }
 
-private val orderIdsDoc: OpenApiRoute.() -> Unit = {
+private val orderIdsDoc: RouteConfig.() -> Unit = {
     description =
         "Endepunkt for å hente ut ordreid-er på en gitt sendersReference"
     tags("Varslinger")
