@@ -16,9 +16,6 @@ fun Application.configureSwagger() {
             description = "Local"
         }
         tags {
-            tag("Autentisering") {
-                description = "Endepunkter for autentisering og håndtering av tokens"
-            }
             tag("Varslinger") {
                 description = "Endepunkter for utsending av varsler via Altinns varslingstjeneste"
             }
