@@ -23,4 +23,4 @@ updates:
     groups:
       ktor-swagger:
         patterns:
-          -"io.github.smiley4:ktor*"
+          - "io.github.smiley4:ktor*"
