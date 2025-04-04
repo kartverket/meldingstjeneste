@@ -20,3 +20,7 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    groups:
+      ktor-swagger:
+        patterns:
+          -"io.github.smiley4:ktor*"
