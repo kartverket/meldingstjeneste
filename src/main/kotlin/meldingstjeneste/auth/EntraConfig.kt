@@ -1,5 +1,7 @@
 package meldingstjeneste.auth
 
+import meldingstjeneste.env
+
 class EntraConfig(
     val tenantId: String,
     val clientId: String,
@@ -15,5 +17,5 @@ class EntraConfig(
 }
 
 fun getConfigFromEnvOrThrow(variableName: String): String =
-    System.getenv(variableName)
+    env[variableName]
         ?: throw IllegalStateException("Unable to initialize app config, \"$variableName\" is null")
