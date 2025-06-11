@@ -10,6 +10,8 @@ import io.ktor.http.isSuccess
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import meldingstjeneste.auth.AuthService
+import meldingstjeneste.auth.getUserId
 import meldingstjeneste.internal.Metrics
 import meldingstjeneste.logger
 import meldingstjeneste.model.AltinnOrderConfirmation
@@ -25,8 +27,15 @@ import meldingstjeneste.model.SmsTemplate
 import meldingstjeneste.service.OrderService
 import java.time.ZonedDateTime
 
-fun Route.orderRoutes(orderService: OrderService) {
+fun Route.orderRoutes(orderService: OrderService, authService: AuthService) {
+
     post("/orders", ordersDoc) {
+        if (!authService.hasAccess(call.getUserId()!!)) {
+            logger.warn("Forbidden access attempt: post request on /orders")
+            call.respond(HttpStatusCode.Forbidden)
+            return@post
+        }
+
         val request = call.receive<OrderRequest>()
         logger.info("Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}")
 
