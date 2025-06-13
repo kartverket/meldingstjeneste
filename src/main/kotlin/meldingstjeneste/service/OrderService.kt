@@ -44,18 +44,6 @@ import meldingstjeneste.plugins.ForbiddenException
 import meldingstjeneste.plugins.UnauthorizedException
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import kotlin.collections.List
-import kotlin.collections.all
-import kotlin.collections.emptyList
-import kotlin.collections.filter
-import kotlin.collections.flatMap
-import kotlin.collections.forEach
-import kotlin.collections.lastIndex
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.plus
-import kotlin.collections.sortedBy
-import kotlin.collections.sortedByDescending
 
 class OrderService {
     private val client = HttpClientProvider.client
@@ -89,7 +77,7 @@ class OrderService {
                 emailTemplate =
                     orderRequest.emailTemplate?.let {
                         AltinnEmailTemplate(
-                            fromAddress = "Statens Kartverk",
+                            fromAddress = "ikke-svar@kartverket.no",
                             contentType = "Plain",
                             subject = it.subject,
                             body = it.body,
