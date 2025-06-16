@@ -9,17 +9,14 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import meldingstjeneste.auth.AUTH_JWT
-import meldingstjeneste.auth.AuthService
 import meldingstjeneste.microsoft.MicrosoftService
 import meldingstjeneste.routes.orderRoutes
 import meldingstjeneste.service.OrderService
 
 fun Application.configureRouting(
     orderService: OrderService,
-    authService: AuthService,
     microsoftService: MicrosoftService,
-
-    ) {
+) {
     routing {
         route("swagger") {
             swaggerUI("/api.json")
@@ -29,8 +26,7 @@ fun Application.configureRouting(
         }
         authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
             microsoftRoutes(microsoftService)
-            orderRoutes(orderService, authService)
+            orderRoutes(orderService)
         }
     }
 }
-

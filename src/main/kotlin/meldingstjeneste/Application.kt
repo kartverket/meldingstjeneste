@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
 package meldingstjeneste
 
 import io.github.cdimascio.dotenv.dotenv
@@ -18,7 +16,6 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.json.Json
 import meldingstjeneste.auth.AuthConfig
-import meldingstjeneste.auth.AuthServiceImpl
 import meldingstjeneste.auth.EntraConfig
 import meldingstjeneste.auth.configureAuth
 import meldingstjeneste.internal.Metrics
@@ -52,7 +49,6 @@ fun Application.module() {
     val entraConfig = EntraConfig.load()
     val authConfig = AuthConfig.load()
     val microsoftService = MicrosoftServiceImpl.load(entraConfig)
-    val authService = AuthServiceImpl(authConfig.superUserGroupId, microsoftService)
     val metricsRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         val logbackMetrics = LogbackMetrics()
@@ -83,7 +79,7 @@ fun Application.module() {
 
     val orderService = OrderService() // Ensure this is initialized properly
     configureSwagger()
-    configureRouting(orderService, authService, microsoftService)
+    configureRouting(orderService, microsoftService)
     configureValidation()
     configureStatusPage()
     internalRoutes(metricsRegistry)

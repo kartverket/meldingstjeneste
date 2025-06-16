@@ -10,8 +10,6 @@ import io.ktor.http.isSuccess
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import meldingstjeneste.auth.AuthService
-import meldingstjeneste.auth.getUserId
 import meldingstjeneste.internal.Metrics
 import meldingstjeneste.logger
 import meldingstjeneste.model.AltinnOrderConfirmation
@@ -27,8 +25,7 @@ import meldingstjeneste.model.SmsTemplate
 import meldingstjeneste.service.OrderService
 import java.time.ZonedDateTime
 
-fun Route.orderRoutes(orderService: OrderService, authService: AuthService) {
-
+fun Route.orderRoutes(orderService: OrderService) {
     post("/orders", ordersDoc) {
         val request = call.receive<OrderRequest>()
         logger.info("Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}")
@@ -64,8 +61,7 @@ fun Route.orderRoutes(orderService: OrderService, authService: AuthService) {
             val body = response.body<AltinnOrderStatusResponse>()
             logger.info("Canceling order with ID $orderId")
             call.respond(HttpStatusCode.OK, body)
-        }
-        else if (response.status == HttpStatusCode.Conflict) {
+        } else if (response.status == HttpStatusCode.Conflict) {
             logger.info("Unable to cancel order with ID $orderId")
             call.respond(response.status, "Ordre kan ikke lengre avbrytes. (ID $orderId)")
         }
@@ -214,7 +210,7 @@ private val cancelDoc: RouteConfig.() -> Unit = {
             description =
                 "Informasjon om ordren og status for utsending. " +
                 "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
-            body<AltinnOrderStatusResponse>{}
+            body<AltinnOrderStatusResponse> {}
         }
         code(HttpStatusCode.Conflict) {
             description =
