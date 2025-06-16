@@ -61,12 +61,12 @@ class TokenService {
                 }
 
             if (!response.status.isSuccess()) {
-                throw IOException("Failed to get access token from token exchange with Altinn: HTTP ${response.status.value}")
+                throw Exception("Failed to get access token from token exchange with Altinn: HTTP ${response.status.value}")
             }
 
             val altinnToken = response.body<String>()
             if (altinnToken.isEmpty()) {
-                throw IOException("Empty response body from exchange access token")
+                throw Exception("Empty response body from exchange access token")
             }
             return altinnToken
         } catch (e: Exception) {
@@ -100,14 +100,14 @@ class TokenService {
                 }
 
             if (!response.status.isSuccess()) {
-                throw IOException("Failed to get access token from Maskinporten: HTTP ${response.status.value}")
+                throw Exception("Failed to get access token from Maskinporten: HTTP ${response.status.value}")
             }
 
             // Parse the response body as a String
             val responseBody: String = response.bodyAsText()
 
             if (responseBody.isBlank()) {
-                throw IOException("Empty response body from Maskinporten")
+                throw Exception("Empty response body from Maskinporten")
             }
 
             // Parse the JSON response
