@@ -8,11 +8,11 @@ plugins {
     id("io.ktor.plugin") version "3.1.3"
 }
 
-group = "meldingstjeneste"
+group = "no.kartverket.meldingstjeneste"
 version = "0.0.1"
 
 application {
-    mainClass.set("meldingstjeneste.ApplicationKt")
+    mainClass.set("no.kartverket.meldingstjeneste.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -20,6 +20,12 @@ application {
 
 repositories {
     mavenCentral()
+}
+
+ktor {
+    fatJar {
+        allowZip64=true
+    }
 }
 
 dependencies {
