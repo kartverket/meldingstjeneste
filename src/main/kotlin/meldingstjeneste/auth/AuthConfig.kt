@@ -20,6 +20,5 @@ data class AuthConfig(
             )
         }
     }
-
 }
 

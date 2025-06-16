@@ -21,16 +21,15 @@ fun Application.configureRouting(
 
     ) {
     routing {
+        route("swagger") {
+            swaggerUI("/api.json")
+        }
+        route("api.json") {
+            openApi()
+        }
         authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
             microsoftRoutes(microsoftService)
             orderRoutes(orderService, authService)
-
-            route("swagger") {
-                swaggerUI("/api.json")
-            }
-            route("api.json") {
-                openApi()
-            }
         }
     }
 }
