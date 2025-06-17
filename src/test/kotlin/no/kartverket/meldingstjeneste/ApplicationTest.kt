@@ -1,4 +1,4 @@
-package meldingstjeneste
+package no.kartverket.meldingstjeneste
 
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode

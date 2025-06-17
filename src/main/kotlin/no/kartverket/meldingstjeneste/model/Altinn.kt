@@ -1,7 +1,7 @@
-package meldingstjeneste.model
+package no.kartverket.meldingstjeneste.model
 
 import kotlinx.serialization.Serializable
-import meldingstjeneste.serializers.KZonedDateTimeSerializer
+import no.kartverket.meldingstjeneste.serializers.KZonedDateTimeSerializer
 import java.time.ZonedDateTime
 
 @Serializable

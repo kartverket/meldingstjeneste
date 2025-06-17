@@ -1,4 +1,4 @@
-package meldingstjeneste.plugins
+package no.kartverket.meldingstjeneste.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*

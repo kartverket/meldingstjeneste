@@ -1,4 +1,4 @@
-package meldingstjeneste.routes
+package no.kartverket.meldingstjeneste.routes
 
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
@@ -10,19 +10,19 @@ import io.ktor.http.isSuccess
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import meldingstjeneste.internal.Metrics
-import meldingstjeneste.logger
-import meldingstjeneste.model.AltinnOrderConfirmation
-import meldingstjeneste.model.AltinnOrderStatusResponse
-import meldingstjeneste.model.AltinnSendersReferenceResponse
-import meldingstjeneste.model.EmailTemplate
-import meldingstjeneste.model.NotificationChannel
-import meldingstjeneste.model.OrderConfirmation
-import meldingstjeneste.model.OrderRequest
-import meldingstjeneste.model.OrderResponse
-import meldingstjeneste.model.PaginationOrders
-import meldingstjeneste.model.SmsTemplate
-import meldingstjeneste.service.OrderService
+import no.kartverket.meldingstjeneste.internal.Metrics
+import no.kartverket.meldingstjeneste.logger
+import no.kartverket.meldingstjeneste.model.AltinnOrderConfirmation
+import no.kartverket.meldingstjeneste.model.AltinnOrderStatusResponse
+import no.kartverket.meldingstjeneste.model.AltinnSendersReferenceResponse
+import no.kartverket.meldingstjeneste.model.EmailTemplate
+import no.kartverket.meldingstjeneste.model.NotificationChannel
+import no.kartverket.meldingstjeneste.model.OrderConfirmation
+import no.kartverket.meldingstjeneste.model.OrderRequest
+import no.kartverket.meldingstjeneste.model.OrderResponse
+import no.kartverket.meldingstjeneste.model.PaginationOrders
+import no.kartverket.meldingstjeneste.model.SmsTemplate
+import no.kartverket.meldingstjeneste.service.OrderService
 import java.time.ZonedDateTime
 
 fun Route.orderRoutes(orderService: OrderService) {
@@ -61,8 +61,7 @@ fun Route.orderRoutes(orderService: OrderService) {
             val body = response.body<AltinnOrderStatusResponse>()
             logger.info("Canceling order with ID $orderId")
             call.respond(HttpStatusCode.OK, body)
-        }
-        else if (response.status == HttpStatusCode.Conflict) {
+        } else if (response.status == HttpStatusCode.Conflict) {
             logger.info("Unable to cancel order with ID $orderId")
             call.respond(response.status, "Ordre kan ikke lengre avbrytes. (ID $orderId)")
         }
@@ -211,7 +210,7 @@ private val cancelDoc: RouteConfig.() -> Unit = {
             description =
                 "Informasjon om ordren og status for utsending. " +
                 "Inkluderer både en overdnet oversikt over ordren og dens status, samt status for hvert enkelt varsel/mottaker."
-            body<AltinnOrderStatusResponse>{}
+            body<AltinnOrderStatusResponse> {}
         }
         code(HttpStatusCode.Conflict) {
             description =

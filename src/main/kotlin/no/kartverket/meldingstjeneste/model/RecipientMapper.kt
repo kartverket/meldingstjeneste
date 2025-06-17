@@ -1,6 +1,6 @@
-package meldingstjeneste.model
+package no.kartverket.meldingstjeneste.model
 
-import meldingstjeneste.env
+import no.kartverket.meldingstjeneste.env
 
 object RecipientMapper {
     // List of nationalIdentityNumbers mapped to specific email addresses.

@@ -1,9 +1,9 @@
-package meldingstjeneste.plugins
+package no.kartverket.meldingstjeneste.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
-import meldingstjeneste.model.NotificationChannel
-import meldingstjeneste.model.OrderRequest
+import no.kartverket.meldingstjeneste.model.NotificationChannel
+import no.kartverket.meldingstjeneste.model.OrderRequest
 import java.time.ZonedDateTime
 
 val nationalIdRegex = Regex("^[0-9]{11}\$")

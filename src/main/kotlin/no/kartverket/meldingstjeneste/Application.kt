@@ -1,6 +1,4 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
-package meldingstjeneste
+package no.kartverket.meldingstjeneste
 
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.HttpHeaders
@@ -17,13 +15,15 @@ import io.micrometer.core.instrument.binder.logging.LogbackMetrics
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.json.Json
-import meldingstjeneste.internal.Metrics
-import meldingstjeneste.internal.internalRoutes
-import meldingstjeneste.plugins.configureRouting
-import meldingstjeneste.plugins.configureStatusPage
-import meldingstjeneste.plugins.configureSwagger
-import meldingstjeneste.plugins.configureValidation
-import meldingstjeneste.service.OrderService
+import no.kartverket.meldingstjeneste.auth.AuthConfig
+import no.kartverket.meldingstjeneste.auth.configureAuth
+import no.kartverket.meldingstjeneste.internal.Metrics
+import no.kartverket.meldingstjeneste.internal.internalRoutes
+import no.kartverket.meldingstjeneste.plugins.configureRouting
+import no.kartverket.meldingstjeneste.plugins.configureStatusPage
+import no.kartverket.meldingstjeneste.plugins.configureSwagger
+import no.kartverket.meldingstjeneste.plugins.configureValidation
+import no.kartverket.meldingstjeneste.service.OrderService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -44,7 +44,7 @@ fun main() {
 
 fun Application.module() {
     logger.info("Starting app..")
-
+    val authConfig = AuthConfig.load()
     val metricsRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         val logbackMetrics = LogbackMetrics()
@@ -65,11 +65,13 @@ fun Application.module() {
     }
 
     install(CORS) {
-        allowHost(env["FRONTEND_INGRESS"].removePrefix("https://"))
+        allowHost(env["FRONTEND_INGRESS"].removePrefix("http://"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Put)
     }
+
+    configureAuth(authConfig)
 
     val orderService = OrderService() // Ensure this is initialized properly
     configureSwagger()

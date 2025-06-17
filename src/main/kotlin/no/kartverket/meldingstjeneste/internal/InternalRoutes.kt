@@ -1,4 +1,4 @@
-package meldingstjeneste.internal
+package no.kartverket.meldingstjeneste.internal
 
 import io.ktor.server.application.Application
 import io.ktor.server.response.respondText

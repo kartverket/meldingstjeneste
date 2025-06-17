@@ -1,4 +1,4 @@
-package meldingstjeneste.serializers
+package no.kartverket.meldingstjeneste.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

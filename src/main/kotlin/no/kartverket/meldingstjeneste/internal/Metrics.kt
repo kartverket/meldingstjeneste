@@ -1,4 +1,4 @@
-package meldingstjeneste.internal
+package no.kartverket.meldingstjeneste.internal
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry

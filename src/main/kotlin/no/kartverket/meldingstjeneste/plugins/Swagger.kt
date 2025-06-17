@@ -1,9 +1,9 @@
-package meldingstjeneste.plugins
+package no.kartverket.meldingstjeneste.plugins
 
 import io.github.smiley4.ktoropenapi.OpenApi
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import meldingstjeneste.port
+import no.kartverket.meldingstjeneste.port
 
 fun Application.configureSwagger() {
     install(OpenApi) {

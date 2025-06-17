@@ -8,11 +8,11 @@ plugins {
     id("io.ktor.plugin") version "3.1.3"
 }
 
-group = "meldingstjeneste"
+group = "no.kartverket.meldingstjeneste"
 version = "0.0.1"
 
 application {
-    mainClass.set("meldingstjeneste.ApplicationKt")
+    mainClass.set("no.kartverket.meldingstjeneste.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -20,6 +20,12 @@ application {
 
 repositories {
     mavenCentral()
+}
+
+ktor {
+    fatJar {
+        allowZip64=true
+    }
 }
 
 dependencies {
@@ -33,6 +39,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("com.microsoft.graph:microsoft-graph:6.39.0")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
@@ -40,6 +47,7 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("com.azure:azure-identity:1.16.2")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")

@@ -1,4 +1,4 @@
-package meldingstjeneste.model
+package no.kartverket.meldingstjeneste.model
 import kotlinx.serialization.Serializable
 
 @Serializable
