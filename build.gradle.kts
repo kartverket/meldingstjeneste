@@ -22,7 +22,7 @@ repositories {
 
 ktor {
     fatJar {
-        allowZip64=true
+        allowZip64 = true
     }
 }
 
@@ -37,7 +37,6 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("com.microsoft.graph:microsoft-graph:6.39.0")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
@@ -45,12 +44,15 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("ch.qos.logback:logback-classic:1.5.18")
-    implementation("com.azure:azure-identity:1.16.2")
-    testImplementation("io.ktor:ktor-server-test-host-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.21")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:1.15.1")
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
+    // Entra-ID authentication
+    implementation("com.microsoft.graph:microsoft-graph:6.39.0")
+    implementation("com.azure:azure-identity:1.16.2")
+
+    testImplementation("io.ktor:ktor-server-test-host-jvm")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.21")
 }
