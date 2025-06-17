@@ -10,8 +10,8 @@ data class AuthConfig(
 ) {
     companion object {
         fun load(): AuthConfig {
-            val tenantId = getConfigFromEnvOrThrow("TENANT_ID")
-            val clientId = getConfigFromEnvOrThrow("CLIENT_ID")
+            val tenantId = getConfigFromEnvOrThrow("AZURE_APP_TENANT_ID")
+            val clientId = getConfigFromEnvOrThrow("AZURE_APP_CLIENT_ID")
             return AuthConfig(
                 tenantId = tenantId,
                 clientId = clientId,
