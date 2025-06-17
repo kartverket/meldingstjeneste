@@ -8,10 +8,12 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.kartverket.meldingstjeneste.auth.AUTH_JWT
+import no.kartverket.meldingstjeneste.auth.AuthConfig
+import no.kartverket.meldingstjeneste.routes.authConfigRoute
 import no.kartverket.meldingstjeneste.routes.orderRoutes
 import no.kartverket.meldingstjeneste.service.OrderService
 
-fun Application.configureRouting(orderService: OrderService) {
+fun Application.configureRouting(orderService: OrderService, authConfig: AuthConfig) {
     routing {
         route("swagger") {
             swaggerUI("/api.json")
@@ -19,6 +21,7 @@ fun Application.configureRouting(orderService: OrderService) {
         route("api.json") {
             openApi()
         }
+        authConfigRoute(authConfig)
         authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
             orderRoutes(orderService)
         }

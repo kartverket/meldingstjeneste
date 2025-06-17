@@ -80,7 +80,7 @@ fun Application.module() {
 
     val orderService = OrderService() // Ensure this is initialized properly
     configureSwagger()
-    configureRouting(orderService)
+    configureRouting(orderService, authConfig)
     configureValidation()
     configureStatusPage()
     internalRoutes(metricsRegistry)
