@@ -20,11 +20,8 @@ class MicrosoftServiceImpl(private val graphClient: GraphServiceClient) : Micros
     companion object {
         fun load(config: EntraConfig): MicrosoftService {
             val scopes = "https://graph.microsoft.com/.default"
-            val credential = ClientSecretCredentialBuilder()
-                .clientId(config.clientId)
-                .tenantId(config.tenantId)
-                .clientSecret(config.clientSecret)
-                .build()
+            val credential = ClientSecretCredentialBuilder().clientId(config.clientId).tenantId(config.tenantId)
+                .clientSecret(config.clientSecret).build()
             val graphClient = GraphServiceClient(credential, scopes)
 
             return MicrosoftServiceImpl(graphClient)

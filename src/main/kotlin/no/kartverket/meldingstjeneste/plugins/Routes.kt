@@ -1,6 +1,5 @@
 package no.kartverket.meldingstjeneste.plugins
 
-import com.kartverket.microsoft.microsoftRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.Application
@@ -25,7 +24,6 @@ fun Application.configureRouting(
             openApi()
         }
         authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
-            microsoftRoutes(microsoftService)
             orderRoutes(orderService)
         }
     }

@@ -47,7 +47,7 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("com.azure:azure-identity:1.+")
+    implementation("com.azure:azure-identity:1.16.2")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
