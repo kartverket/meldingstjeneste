@@ -64,8 +64,13 @@ fun Application.module() {
         )
     }
 
+    val frontendIngress = env["FRONTEND_INGRESS"] ?: error("FRONTEND_INGRESS ikke satt")
+    val frontendHost = frontendIngress
+        .removePrefix("https://")
+        .removePrefix("http://")
+
     install(CORS) {
-        allowHost(env["FRONTEND_INGRESS"].removePrefix("http://"))
+        allowHost(frontendHost, schemes = listOf("http", "https"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Put)
