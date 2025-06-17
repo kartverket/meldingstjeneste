@@ -1,5 +1,7 @@
 package no.kartverket.meldingstjeneste.auth
 
+import no.kartverket.meldingstjeneste.env
+
 data class AuthConfig(
     val tenantId: String,
     val clientId: String,
@@ -20,3 +22,6 @@ data class AuthConfig(
     }
 }
 
+fun getConfigFromEnvOrThrow(variableName: String): String =
+    env[variableName]
+        ?: throw IllegalStateException("Unable to initialize app config, \"$variableName\" is null")

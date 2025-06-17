@@ -8,14 +8,10 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.kartverket.meldingstjeneste.auth.AUTH_JWT
-import no.kartverket.meldingstjeneste.microsoft.MicrosoftService
 import no.kartverket.meldingstjeneste.routes.orderRoutes
 import no.kartverket.meldingstjeneste.service.OrderService
 
-fun Application.configureRouting(
-    orderService: OrderService,
-    microsoftService: MicrosoftService,
-) {
+fun Application.configureRouting(orderService: OrderService) {
     routing {
         route("swagger") {
             swaggerUI("/api.json")

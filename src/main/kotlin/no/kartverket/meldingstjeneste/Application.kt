@@ -16,17 +16,14 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.json.Json
 import no.kartverket.meldingstjeneste.auth.AuthConfig
-import no.kartverket.meldingstjeneste.auth.EntraConfig
 import no.kartverket.meldingstjeneste.auth.configureAuth
 import no.kartverket.meldingstjeneste.internal.Metrics
 import no.kartverket.meldingstjeneste.internal.internalRoutes
-import no.kartverket.meldingstjeneste.microsoft.MicrosoftServiceImpl
 import no.kartverket.meldingstjeneste.plugins.configureRouting
 import no.kartverket.meldingstjeneste.plugins.configureStatusPage
 import no.kartverket.meldingstjeneste.plugins.configureSwagger
 import no.kartverket.meldingstjeneste.plugins.configureValidation
 import no.kartverket.meldingstjeneste.service.OrderService
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -47,9 +44,7 @@ fun main() {
 
 fun Application.module() {
     logger.info("Starting app..")
-    val entraConfig = EntraConfig.load()
     val authConfig = AuthConfig.load()
-    val microsoftService = MicrosoftServiceImpl.load(entraConfig)
     val metricsRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     install(MicrometerMetrics) {
         val logbackMetrics = LogbackMetrics()
@@ -80,7 +75,7 @@ fun Application.module() {
 
     val orderService = OrderService() // Ensure this is initialized properly
     configureSwagger()
-    configureRouting(orderService, microsoftService)
+    configureRouting(orderService)
     configureValidation()
     configureStatusPage()
     internalRoutes(metricsRegistry)
