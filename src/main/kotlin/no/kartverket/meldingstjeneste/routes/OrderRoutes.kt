@@ -10,6 +10,7 @@ import io.ktor.http.isSuccess
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import no.kartverket.meldingstjeneste.auth.getUserId
 import no.kartverket.meldingstjeneste.internal.Metrics
 import no.kartverket.meldingstjeneste.logger
 import no.kartverket.meldingstjeneste.model.AltinnOrderConfirmation
@@ -28,9 +29,12 @@ import java.time.ZonedDateTime
 fun Route.orderRoutes(orderService: OrderService) {
     post("/orders", ordersDoc) {
         val request = call.receive<OrderRequest>()
-        logger.info("Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}")
+        logger.info(
+            "Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}. Sent by ${call.getUserId()}",
+        )
 
-        val requestWithUniqueIdentityNumbers = request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
+        val requestWithUniqueIdentityNumbers =
+            request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
         val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
 
         if (response.status.isSuccess()) {
@@ -71,7 +75,8 @@ fun Route.orderRoutes(orderService: OrderService) {
     get("/orders", paginationDoc) {
         val type = call.request.queryParameters["type"]
         val sendersReference =
-            call.request.queryParameters["sendersReference"] ?: throw IllegalArgumentException("'sendersReference' is required")
+            call.request.queryParameters["sendersReference"]
+                ?: throw IllegalArgumentException("'sendersReference' is required")
         val index =
             call.request.queryParameters["index"]!!.toIntOrNull()
                 ?: throw IllegalArgumentException("'index' is required and should be an integer")
@@ -81,7 +86,8 @@ fun Route.orderRoutes(orderService: OrderService) {
     }
 
     get("/orders/ids/{sendersReference}", orderIdsDoc) {
-        val sendersReference = call.parameters["sendersReference"] ?: throw IllegalArgumentException("'sendersReference' is required")
+        val sendersReference =
+            call.parameters["sendersReference"] ?: throw IllegalArgumentException("'sendersReference' is required")
         val response = orderService.getAltinnOrders(sendersReference = sendersReference)
 
         if (response.status.isSuccess()) {
@@ -151,7 +157,8 @@ private val ordersDoc: RouteConfig.() -> Unit = {
             }
         }
         code(HttpStatusCode.BadRequest) {
-            description = "Feil ved forespørelen. Dette kan skyldes ugyldige ID-numre eller feil format på forespørselen."
+            description =
+                "Feil ved forespørelen. Dette kan skyldes ugyldige ID-numre eller feil format på forespørselen."
         }
         code(HttpStatusCode.InternalServerError) {
             description =
