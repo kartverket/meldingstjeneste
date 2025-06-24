@@ -42,7 +42,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.0-0.6.x-compat")
     implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
