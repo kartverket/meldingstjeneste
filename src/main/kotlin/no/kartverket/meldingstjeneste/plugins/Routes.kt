@@ -13,7 +13,10 @@ import no.kartverket.meldingstjeneste.routes.authConfigRoute
 import no.kartverket.meldingstjeneste.routes.orderRoutes
 import no.kartverket.meldingstjeneste.service.OrderService
 
-fun Application.configureRouting(orderService: OrderService, authConfig: AuthConfig) {
+fun Application.configureRouting(
+    orderService: OrderService,
+    authConfig: AuthConfig,
+) {
     routing {
         route("swagger") {
             swaggerUI("/api.json")

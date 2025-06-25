@@ -103,6 +103,7 @@ fun Route.orderRoutes(orderService: OrderService) {
 
 private val ordersDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
+    securitySchemeNames = listOf("entra")
     summary = "Send varsel til en liste med fødselsnummer"
     description =
         "Bestill utsending av varsler til én eller flere mottakere basert på fødselsnummer. \n\n" +
@@ -169,6 +170,7 @@ private val ordersDoc: RouteConfig.() -> Unit = {
 
 private val statusDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
+    securitySchemeNames = listOf("entra")
     summary = "Hent status for en ordre"
     description =
         "Endepunkt for å hente ut detaljert informasjon om en ordre og status på alle dens varsler. Her kan du følge med på hvordan det går med varslene du bestilte."
@@ -203,6 +205,7 @@ private val statusDoc: RouteConfig.() -> Unit = {
 
 private val cancelDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
+    securitySchemeNames = listOf("entra")
     summary = "Avbryt en bestilt ordre"
     description =
         "Endepunkt for å avbryte en bestilt ordre. Hvis orderen har kommet for langt i sin prosess, vil den ikke kunne avbrytes."
@@ -240,6 +243,7 @@ private val cancelDoc: RouteConfig.() -> Unit = {
 
 private val paginationDoc: RouteConfig.() -> Unit = {
     tags("Varslinger")
+    securitySchemeNames = listOf("entra")
     summary = "Hent en paginert liste med ordre og deres status"
     description =
         "Paginert endepunkt for å hente ut alle ordre som er sendt fra en spesifikk avsender. " +
@@ -280,9 +284,10 @@ private val paginationDoc: RouteConfig.() -> Unit = {
 }
 
 private val orderIdsDoc: RouteConfig.() -> Unit = {
+    tags("Varslinger")
+    securitySchemeNames = listOf("entra")
     description =
         "Endepunkt for å hente ut ordreid-er på en gitt sendersReference"
-    tags("Varslinger")
     request {
         queryParameter<String>("sendersReference") {
             description = "Senders reference"

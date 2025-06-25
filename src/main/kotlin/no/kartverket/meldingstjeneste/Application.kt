@@ -65,21 +65,23 @@ fun Application.module() {
     }
 
     val frontendIngress = env["FRONTEND_INGRESS"] ?: error("FRONTEND_INGRESS ikke satt")
-    val frontendHost = frontendIngress
-        .removePrefix("https://")
-        .removePrefix("http://")
+    val frontendHost =
+        frontendIngress
+            .removePrefix("https://")
+            .removePrefix("http://")
 
     install(CORS) {
         allowHost(frontendHost, schemes = listOf("http", "https"))
+        allowHost("127.0.0.1:$port", schemes = listOf("http"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Put)
     }
 
     configureAuth(authConfig)
+    configureSwagger()
 
     val orderService = OrderService() // Ensure this is initialized properly
-    configureSwagger()
     configureRouting(orderService, authConfig)
     configureValidation()
     configureStatusPage()
