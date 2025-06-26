@@ -72,7 +72,6 @@ fun Application.module() {
 
     install(CORS) {
         allowHost(frontendHost, schemes = listOf("http", "https"))
-        allowHost("127.0.0.1:$port", schemes = listOf("http"))
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         allowMethod(HttpMethod.Put)
