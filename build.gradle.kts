@@ -53,7 +53,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.15.1")
     implementation("net.logstash.logback:logstash-logback-encoder:8.1")
     // Entra-ID authentication
-    implementation("com.microsoft.graph:microsoft-graph:6.45.0")
+    implementation("com.microsoft.graph:microsoft-graph:6.46.0")
     implementation("com.azure:azure-identity:1.16.2")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
