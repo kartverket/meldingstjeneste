@@ -100,6 +100,7 @@ jobs:
       - name: Update version
         run: |
           echo "\"${{ needs.build.outputs.image_url }}\"" > "env/atkv3-dev/egenreg-main/${{ env.argo_version_file }}"
+          echo "\"${{ needs.build.outputs.image_url }}\"" > "env/atgcp1-dev/egenreg-main/${{ env.argo_version_file }}"
           git config --global user.email "noreply@kartverket.no"
           git config --global user.name "Egenreg CI"
           git commit -am "Update Egenreg ${{ env.argo_version_file }}"
