@@ -24,9 +24,11 @@ fun Application.configureRouting(
         route("api.json") {
             openApi()
         }
-        authConfigRoute(authConfig)
-        authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
-            orderRoutes(orderService)
+        route("/api") {
+            authConfigRoute(authConfig)
+            authenticate(AUTH_JWT, strategy = AuthenticationStrategy.Required) {
+                orderRoutes(orderService)
+            }
         }
     }
 }
