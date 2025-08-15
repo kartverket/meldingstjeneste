@@ -60,11 +60,14 @@ object TokenManager {
 class TokenService {
     val logger: Logger = LoggerFactory.getLogger(TokenService::class.java)
 
+    val altinnBaseUrl: String = env["ALTINN_BASE_URL"]
+    val maskinportenBaseUrl: String = env["MASKINPORTEN_BASE_URL"]
+
     suspend fun exchangeAccessToken(accessTokenMaskinporten: String): String {
         val client = HttpClient()
         try {
             val response: HttpResponse =
-                client.get("https://platform.tt02.altinn.no/authentication/api/v1/exchange/maskinporten?test=false") {
+                client.get("$altinnBaseUrl/authentication/api/v1/exchange/maskinporten?test=false") {
                     header(HttpHeaders.Authorization, "Bearer $accessTokenMaskinporten")
                 }
 
@@ -78,6 +81,7 @@ class TokenService {
             }
             return altinnToken
         } catch (e: Exception) {
+            logger.error("Failed to get access token from altinn", e)
             throw e
         } finally {
             client.close()
@@ -96,7 +100,7 @@ class TokenService {
         try {
             val jwt = getSignedJWT(apiProvider)
             val response: HttpResponse =
-                client.post("https://test.maskinporten.no/token") {
+                client.post("$maskinportenBaseUrl/token") {
                     contentType(ContentType.Application.FormUrlEncoded)
                     setBody(
                         Parameters
@@ -177,7 +181,7 @@ class TokenService {
             JWT
                 .create()
                 .withIssuer(clientId)
-                .withAudience("https://test.maskinporten.no/")
+                .withAudience("$maskinportenBaseUrl/")
                 .withIssuedAt(Date())
                 .withClaim(
                     "scope",
