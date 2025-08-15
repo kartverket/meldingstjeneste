@@ -3,11 +3,19 @@ package no.kartverket.meldingstjeneste.service
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.client.HttpClient
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.utils.io.errors.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.Parameters
+import io.ktor.http.contentType
+import io.ktor.http.formUrlEncode
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -100,14 +108,14 @@ class TokenService {
                 }
 
             if (!response.status.isSuccess()) {
-                throw Exception("Failed to get access token from Maskinporten: HTTP ${response.status.value}")
+                throw RuntimeException("Failed to get access token from Maskinporten: HTTP ${response.status.value}")
             }
 
             // Parse the response body as a String
             val responseBody: String = response.bodyAsText()
 
             if (responseBody.isBlank()) {
-                throw Exception("Empty response body from Maskinporten")
+                throw RuntimeException("Empty response body from Maskinporten")
             }
 
             // Parse the JSON response
@@ -130,30 +138,27 @@ class TokenService {
         val clientId: String
         val jwkJson: String
         val claimValue: String
-        val keyId: String
 
         when (apiProvider) {
             "notifications" -> {
-                clientId = env["ALTINN_CLIENT_ID"]
-                jwkJson = env["ALTINN_JWK"]
+                clientId = env["MASKINPORTEN_CLIENT_ID"]
+                jwkJson = env["MASKINPORTEN_CLIENT_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
-                keyId = "kart_melding_test"
             }
             "krr" -> {
                 clientId = env["KRR_CLIENT_ID"]
                 jwkJson = env["KRR_JWK"]
                 claimValue = "krr:global/kontaktinformasjon.read krr:global/digitalpost.read"
-                keyId = "kart_melding_krr_test"
             }
             else -> throw IllegalArgumentException("Invalid type: $apiProvider")
         }
 
-        if (clientId.isNullOrBlank() || jwkJson.isNullOrBlank()) {
+        if (clientId.isBlank() || jwkJson.isBlank()) {
             throw NullPointerException("Client Id or JWK must be set in environment variables")
         }
 
         val jwk: Jwk = try {Json.decodeFromString(jwkJson)} catch (e: Exception) {
-            logger.error("Failed to parse JWK JSON: $jwkJson")
+            logger.error("Failed to parse JWK JSON: $jwkJson", e)
             throw IllegalArgumentException("Failed to parse JWK JSON: $jwkJson")
         }
 
@@ -177,7 +182,8 @@ class TokenService {
                 .withClaim(
                     "scope",
                     claimValue,
-                ).withKeyId(keyId)
+                )
+                .withKeyId(jwk.kid)
                 .withExpiresAt(Date(System.currentTimeMillis() + 2 * 60 * 1000)) // 2 minutes expiry
                 .sign(algorithm)
         return token
