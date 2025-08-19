@@ -16,10 +16,12 @@ data class AuthConfigResponse(
 
 fun Route.authConfigRoute(authConfig: AuthConfig) {
     get("/authConfig") {
+        call.application.environment.log.info("Getting auth config")
+
         call.respond(
             AuthConfigResponse(
-                authConfig.clientId,
-                "https://login.microsoftonline.com/${authConfig.tenantId}",
+                AZURE_APP_CLIENT_ID = authConfig.clientId,
+                AZURE_APP_AUTHORITY = "https://login.microsoftonline.com/${authConfig.tenantId}",
                 AZURE_APP_LOGIN_REDIRECT_URI = env["FRONTEND_INGRESS"],
             )
         )
