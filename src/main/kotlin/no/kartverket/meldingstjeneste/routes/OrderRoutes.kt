@@ -28,24 +28,29 @@ import java.time.ZonedDateTime
 
 fun Route.orderRoutes(orderService: OrderService) {
     post("/orders", ordersDoc) {
-        val request = call.receive<OrderRequest>()
-        logger.info(
-            "Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}. Sent by ${call.getUserId()}",
-        )
+        try {
+            val request = call.receive<OrderRequest>()
+            logger.info(
+                "Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}. Sent by ${call.getUserId()}",
+            )
 
-        val requestWithUniqueIdentityNumbers =
-            request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
-        val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
+            val requestWithUniqueIdentityNumbers =
+                request.copy(nationalIdentityNumbers = request.nationalIdentityNumbers.distinct())
+            val response = orderService.sendOrder(requestWithUniqueIdentityNumbers)
 
-        if (response.status.isSuccess()) {
-            Metrics.antallOrdreBestilt.increment()
-            val body = response.body<AltinnOrderConfirmation>()
-            val orderConfirmation = orderService.createOrderConfirmation(body, request)
-            logger.info("Successfully sent order request ${orderConfirmation.id} to Altinn")
-            call.respond(response.status, orderConfirmation)
-        } else {
-            logger.info("Order request to Altinn failed with status code: ${response.status.value}")
-            call.respond(response)
+            if (response.status.isSuccess()) {
+                Metrics.antallOrdreBestilt.increment()
+                val body = response.body<AltinnOrderConfirmation>()
+                val orderConfirmation = orderService.createOrderConfirmation(body, request)
+                logger.info("Successfully sent order request ${orderConfirmation.id} to Altinn")
+                call.respond(response.status, orderConfirmation)
+            } else {
+                logger.error("Order request to Altinn failed with status code: ${response.status.value}")
+                call.respond(response)
+            }
+        } catch (e: Exception) {
+            logger.error("Error posting order", e)
+            throw e
         }
     }
 
