@@ -21,6 +21,7 @@ import no.kartverket.meldingstjeneste.model.AltinnEmailTemplate
 import no.kartverket.meldingstjeneste.model.AltinnNotificationResponse
 import no.kartverket.meldingstjeneste.model.AltinnNotificationStatusResponse
 import no.kartverket.meldingstjeneste.model.AltinnOrderConfirmation
+import no.kartverket.meldingstjeneste.model.AltinnOrderRequest
 import no.kartverket.meldingstjeneste.model.AltinnOrderResponse
 import no.kartverket.meldingstjeneste.model.AltinnOrderStatusResponse
 import no.kartverket.meldingstjeneste.model.AltinnSendersReferenceResponse
@@ -41,18 +42,20 @@ import no.kartverket.meldingstjeneste.model.RecipientLookup
 import no.kartverket.meldingstjeneste.model.RecipientMapper
 import no.kartverket.meldingstjeneste.plugins.ForbiddenException
 import no.kartverket.meldingstjeneste.plugins.UnauthorizedException
-import no.kartverket.meldingstjeneste.model.AltinnOrderRequest
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 class OrderService {
     private val client = HttpClientProvider.client
 
-    private suspend fun postAltinnOrder(body: AltinnOrderRequest): HttpResponse =
-        client.post("$NOTIFICATIONS_URL/orders") {
+    private suspend fun postAltinnOrder(body: AltinnOrderRequest): HttpResponse {
+        val response = client.post("$NOTIFICATIONS_URL/orders") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
+
+        return response
+    }
 
     suspend fun getAltinnOrders(sendersReference: String): HttpResponse =
         client.get("$NOTIFICATIONS_URL/orders?sendersReference=$sendersReference")
@@ -421,7 +424,7 @@ class OrderService {
     private fun checkIfDateIsLaterThanNow(date: String): Boolean = ZonedDateTime.parse(date).isAfter(ZonedDateTime.now().plusMinutes(5))
 
     companion object {
-        val BASE_URL = env["ALTINN_BASE_URL"]
+        val BASE_URL: String = env["ALTINN_BASE_URL"]
         val NOTIFICATIONS_URL = "$BASE_URL/notifications/api/v1"
     }
 }
