@@ -63,39 +63,14 @@ class TokenService {
     val altinnBaseUrl: String = env["ALTINN_BASE_URL"]
     val maskinportenBaseUrl: String = env["MASKINPORTEN_BASE_URL"]
 
-    suspend fun exchangeAccessToken(accessTokenMaskinporten: String): String {
-        val client = HttpClient()
-        try {
-            val response: HttpResponse =
-                client.get("$altinnBaseUrl/authentication/api/v1/exchange/maskinporten?test=false") {
-                    header(HttpHeaders.Authorization, "Bearer $accessTokenMaskinporten")
-                }
-
-            if (!response.status.isSuccess()) {
-                throw Exception("Failed to get access token from token exchange with Altinn: HTTP ${response.status.value}")
-            }
-
-            val altinnToken = response.body<String>()
-            if (altinnToken.isEmpty()) {
-                throw Exception("Empty response body from exchange access token")
-            }
-            return altinnToken
-        } catch (e: Exception) {
-            logger.error("Failed to get access token from altinn", e)
-            throw e
-        } finally {
-            client.close()
-        }
-    }
-
     suspend fun getAccessToken(): String =
         exchangeAccessToken(
             getMaskinportenToken("notifications"),
         )
 
-    suspend fun getKrrAccessToken(): String = getMaskinportenToken("krr")
+    private suspend fun getMaskinportenToken(apiProvider: String): String {
+        logger.info("Fetching Maskinporten token for $apiProvider")
 
-    suspend fun getMaskinportenToken(apiProvider: String): String {
         val client = HttpClient()
         try {
             val jwt = getSignedJWT(apiProvider)
@@ -112,7 +87,7 @@ class TokenService {
                 }
 
             if (!response.status.isSuccess()) {
-                throw RuntimeException("Failed to get access token from Maskinporten: HTTP ${response.status.value}")
+                throw RuntimeException("Failed to get access token from Maskinporten - ${response.status.value} - ${response.bodyAsText()}")
             }
 
             // Parse the response body as a String
@@ -138,6 +113,35 @@ class TokenService {
         }
     }
 
+    private suspend fun exchangeAccessToken(accessTokenMaskinporten: String): String {
+        logger.info("Exchanging access token from Maskinporten to Altinn")
+
+        val client = HttpClient()
+        try {
+            val response: HttpResponse =
+                client.get("$altinnBaseUrl/authentication/api/v1/exchange/maskinporten?test=false") {
+                    header(HttpHeaders.Authorization, "Bearer $accessTokenMaskinporten")
+                }
+
+            if (!response.status.isSuccess()) {
+                throw Exception("Failed to get access token from token exchange with Altinn - ${response.status.value} - ${response.bodyAsText()}")
+            }
+
+            val altinnToken = response.body<String>()
+            if (altinnToken.isEmpty()) {
+                throw Exception("Empty response body from exchange access token")
+            }
+            return altinnToken
+        } catch (e: Exception) {
+            logger.error("Failed to get access token from altinn", e)
+            throw e
+        } finally {
+            client.close()
+        }
+    }
+
+    private suspend fun getKrrAccessToken(): String = getMaskinportenToken("krr")
+
     private fun getSignedJWT(apiProvider: String): String {
         val clientId: String
         val jwkJson: String
@@ -149,11 +153,13 @@ class TokenService {
                 jwkJson = env["MASKINPORTEN_CLIENT_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
             }
+
             "krr" -> {
                 clientId = env["KRR_CLIENT_ID"]
                 jwkJson = env["KRR_JWK"]
                 claimValue = "krr:global/kontaktinformasjon.read krr:global/digitalpost.read"
             }
+
             else -> throw IllegalArgumentException("Invalid type: $apiProvider")
         }
 
@@ -161,7 +167,9 @@ class TokenService {
             throw NullPointerException("Client Id or JWK must be set in environment variables")
         }
 
-        val jwk: Jwk = try {Json.decodeFromString(jwkJson)} catch (e: Exception) {
+        val jwk: Jwk = try {
+            Json.decodeFromString(jwkJson)
+        } catch (e: Exception) {
             logger.error("Failed to parse JWK JSON: $jwkJson", e)
             throw IllegalArgumentException("Failed to parse JWK JSON: $jwkJson")
         }
