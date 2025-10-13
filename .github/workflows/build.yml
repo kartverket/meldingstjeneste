@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run Pharos"
-        uses: kartverket/pharos@6515521b3d6b24241fc5508aaf33da692492f4df # v0.4.1
+        uses: kartverket/pharos@fda2f571fa7d1df3e976e83ab54f3a3592991ded # v0.5.0
         with:
           image_url: ${{ needs.docker.outputs.image_url}}
 
