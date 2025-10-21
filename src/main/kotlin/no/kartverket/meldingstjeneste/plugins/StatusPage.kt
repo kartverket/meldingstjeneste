@@ -8,6 +8,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.util.*
 import io.ktor.utils.io.InternalAPI
+import no.kartverket.meldingstjeneste.logger
 
 @OptIn(InternalAPI::class)
 fun Application.configureStatusPage() {
@@ -31,6 +32,7 @@ fun Application.configureStatusPage() {
             call.respond(HttpStatusCode.BadRequest, "${cause.rootCause?.message}")
         }
         exception<Throwable> { call, cause ->
+            logger.error("Noe gikk galt", cause)
             call.respond(HttpStatusCode.InternalServerError, "\n ERROR: $cause \n")
         }
     }
