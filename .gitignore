@@ -42,3 +42,4 @@ kls_classpath
 kls_database.db
 
 .env
+.DS_Store

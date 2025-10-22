@@ -12,6 +12,7 @@ Dersom man ikke har bygget Docker image må man gjøre dette først.
 Naviger til rotnivå i prosjektet (samme nivå som Dockerfile) og
 kjør kommandoen under. Dette bygger et Docker image med tag _meldingstjeneste_.
 ```bash
+./gradlew build
 docker build -t meldingstjeneste .
 ```
 
@@ -19,9 +20,8 @@ Deretter må man kjøre applikasjonen. Dette kan gjøres ved å skrive inn komma
 ```bash
 docker run --env-file .env -p 8080:8080 meldingstjeneste
 ```
-
-Her må man også ha en .env fil med nøkler _clientId_, _jwk_. De to første verdiene kommer fra integrasjonen med Maskinporten opprettet i Samarbeidsportalen. 
-Applikasjonen og endepunkt kan nå aksesseres på _localhost:8080_.
+Her må man også opprette en `.env` fil med innhold tilsvarende `.env.template` som man finner på rotnivå.
+Verdiene kan hentes fra applikasjons-pod'en i ArgoCD gjennom å skrive `env` i shellet.
 
 ## Hot reload
 For å skru på hot reload må du først aktivere development mode i ktor, og så sørge for at prosjektet rekompileres ved endring.
