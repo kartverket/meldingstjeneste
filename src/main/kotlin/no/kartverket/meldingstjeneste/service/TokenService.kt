@@ -116,8 +116,6 @@ class TokenService {
         }
     }
 
-    private suspend fun getKrrAccessToken(): String = getMaskinportenToken("krr")
-
     private fun getSignedJWT(apiProvider: String): String {
         val clientId: String
         val jwkJson: String
@@ -128,12 +126,6 @@ class TokenService {
                 clientId = env["MASKINPORTEN_CLIENT_ID"]
                 jwkJson = env["MASKINPORTEN_CLIENT_JWK"]
                 claimValue = "altinn:serviceowner/notifications.create"
-            }
-
-            "krr" -> {
-                clientId = env["KRR_CLIENT_ID"]
-                jwkJson = env["KRR_JWK"]
-                claimValue = "krr:global/kontaktinformasjon.read krr:global/digitalpost.read"
             }
 
             else -> throw IllegalArgumentException("Invalid type: $apiProvider")
