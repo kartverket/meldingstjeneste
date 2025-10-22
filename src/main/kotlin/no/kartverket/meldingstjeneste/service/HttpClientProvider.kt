@@ -1,34 +1,42 @@
 package no.kartverket.meldingstjeneste.service
 
 import io.ktor.client.*
-import io.ktor.client.plugins.*
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import no.kartverket.meldingstjeneste.service.OrderService.Companion.BASE_URL
+
 
 object HttpClientProvider {
-    val client: HttpClient by lazy {
-        HttpClient {
-            defaultRequest {
-                url(BASE_URL)
-                bearerAuth(updateAccessToken())
-            }
+     val client =
+        HttpClient(OkHttp) {
             install(ContentNegotiation) {
                 json(
                     Json {
                         encodeDefaults = false
                         ignoreUnknownKeys = true
-                    },
+                        },
                 )
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val accessToken = runBlocking {
+                            TokenService().getAccessToken()
+                        }
+                        BearerTokens(accessToken, "")
+                    }
+                    refreshTokens {
+                        val accessToken = runBlocking {
+                            TokenService().getAccessToken()
+                        }
+                        BearerTokens(accessToken, "")
+                    }
             }
         }
     }
-
-    private fun updateAccessToken(): String =
-        runBlocking {
-            TokenManager.getToken()
-        }
 }

@@ -32,30 +32,6 @@ import java.security.spec.RSAPrivateKeySpec
 import java.util.Base64
 import java.util.Date
 
-object TokenManager {
-    private var token: String? = null
-    private val tokenService: TokenService = TokenService()
-    private var tokenExpiration: Date? = null
-
-    init {
-        runBlocking {
-            refreshToken()
-        }
-    }
-
-    suspend fun getToken(): String {
-        val now = Date()
-        if (token == null || tokenExpiration == null || now.after(tokenExpiration)) {
-            refreshToken()
-        }
-        return token!!
-    }
-
-    private suspend fun refreshToken() {
-        token = tokenService.getAccessToken()
-        tokenExpiration = JWT.decode(token).expiresAt
-    }
-}
 
 class TokenService {
     val logger: Logger = LoggerFactory.getLogger(TokenService::class.java)
