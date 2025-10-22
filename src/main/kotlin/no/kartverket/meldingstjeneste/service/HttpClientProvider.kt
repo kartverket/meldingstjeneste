@@ -9,6 +9,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import no.kartverket.meldingstjeneste.logger
 
 
 object HttpClientProvider {
@@ -28,12 +29,14 @@ object HttpClientProvider {
                         val accessToken = runBlocking {
                             TokenService().getAccessToken()
                         }
+                        logger.info("Setting access token for client")
                         BearerTokens(accessToken, "")
                     }
                     refreshTokens {
                         val accessToken = runBlocking {
                             TokenService().getAccessToken()
                         }
+                        logger.info("Fetching new access token due to 401 from Altinn")
                         BearerTokens(accessToken, "")
                     }
             }

@@ -31,7 +31,7 @@ fun Route.orderRoutes(orderService: OrderService) {
         try {
             val request = call.receive<OrderRequest>()
             logger.info(
-                "Received order request from ${request.sendersReference} with notificationChannel ${request.notificationChannel}. Sent by ${call.getUserId()}",
+                "Attempting to send order from ${request.sendersReference} with notificationChannel ${request.notificationChannel}, sent by user id ${call.getUserId()}",
             )
 
             val requestWithUniqueIdentityNumbers =
@@ -57,7 +57,7 @@ fun Route.orderRoutes(orderService: OrderService) {
     get("/orders/{id}", statusDoc) {
         val orderId = call.parameters["id"].toString()
         val status = orderService.getOrderStatus(orderId)
-        logger.info("Responding to request for order with ID $orderId: status ${status.orderStatus}")
+        logger.info("Order $orderId has status ${status.orderStatus}")
 
         call.respond(HttpStatusCode.OK, status)
     }
@@ -68,7 +68,7 @@ fun Route.orderRoutes(orderService: OrderService) {
         val response = orderService.cancelOrder(orderId)
         if (response.status.isSuccess()) {
             val body = response.body<AltinnOrderStatusResponse>()
-            logger.info("Canceling order with ID $orderId")
+            logger.info("Cancelling order with ID $orderId")
             call.respond(HttpStatusCode.OK, body)
         } else if (response.status == HttpStatusCode.Conflict) {
             logger.info("Unable to cancel order with ID $orderId")
@@ -85,7 +85,7 @@ fun Route.orderRoutes(orderService: OrderService) {
         val index =
             call.request.queryParameters["index"]!!.toIntOrNull()
                 ?: throw IllegalArgumentException("'index' is required and should be an integer")
-        logger.info("Received request for all orders from $sendersReference")
+        logger.info("Retrieving all orders from $sendersReference from index $index")
         val response = orderService.paginateOrders(sendersReference = sendersReference, orderType = type, index = index)
         call.respond(HttpStatusCode.OK, response)
     }
