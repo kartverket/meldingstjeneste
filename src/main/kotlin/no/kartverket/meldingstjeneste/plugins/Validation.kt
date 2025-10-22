@@ -6,7 +6,7 @@ import no.kartverket.meldingstjeneste.model.NotificationChannel
 import no.kartverket.meldingstjeneste.model.OrderRequest
 import java.time.ZonedDateTime
 
-val nationalIdRegex = Regex("^[0-9]{11}\$")
+val nationalIdRegex = Regex("^\\d{11}$")
 
 fun Application.configureValidation() {
     install(RequestValidation) {

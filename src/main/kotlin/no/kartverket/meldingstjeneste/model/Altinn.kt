@@ -86,6 +86,7 @@ data class AltinnProcessingStatusResponse(
 )
 
 @Serializable
+@Suppress("UNUSED")
 enum class AltinnOrderConfirmationStatus {
     Success,
     PartialSuccess,
