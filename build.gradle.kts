@@ -57,5 +57,5 @@ dependencies {
     implementation("com.azure:azure-identity:1.18.1")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.21")
 }
