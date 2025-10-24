@@ -30,6 +30,7 @@ import java.security.interfaces.RSAPrivateKey
 import java.security.spec.RSAPrivateKeySpec
 import java.util.Base64
 import java.util.Date
+import java.util.UUID
 
 
 class TokenService {
@@ -163,6 +164,7 @@ class TokenService {
                     claimValue,
                 )
                 .withKeyId(jwk.kid)
+                .withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(Date(System.currentTimeMillis() + 2 * 60 * 1000)) // 2 minutes expiry
                 .sign(algorithm)
         return token
