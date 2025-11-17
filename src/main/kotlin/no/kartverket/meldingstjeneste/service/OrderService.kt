@@ -81,7 +81,7 @@ class OrderService {
                     orderRequest.emailTemplate?.let {
                         AltinnEmailTemplate(
                             fromAddress = "ikke-svar@kartverket.no",
-                            contentType = "Plain",
+                            contentType = "html",
                             subject = it.subject,
                             body = it.body,
                         )
