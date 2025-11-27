@@ -23,7 +23,9 @@ import no.kartverket.meldingstjeneste.plugins.configureRouting
 import no.kartverket.meldingstjeneste.plugins.configureStatusPage
 import no.kartverket.meldingstjeneste.plugins.configureSwagger
 import no.kartverket.meldingstjeneste.plugins.configureValidation
+import no.kartverket.meldingstjeneste.routes.eFormidlingroutes
 import no.kartverket.meldingstjeneste.service.OrderService
+import no.kartverket.meldingstjeneste.service.eFormidlingService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -35,7 +37,7 @@ val env =
 
 val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
 val environment: String = env["ENVIRONMENT"]
-val port = if (environment == "localhost") 8081 else 8080
+val port = if (environment == "localhost") 8079 else 8080
 
 fun main() {
     embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
@@ -81,8 +83,10 @@ fun Application.module() {
     configureSwagger()
 
     val orderService = OrderService() // Ensure this is initialized properly
+    val eFormidlingService = eFormidlingService()
     configureRouting(orderService, authConfig)
     configureValidation()
     configureStatusPage()
+    eFormidlingroutes(eFormidlingService)
     internalRoutes(metricsRegistry)
 }
