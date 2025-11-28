@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 class eFormidlingService {
 
     private val eFormidlingClient = EFormidlingClient()
-    val logger = LoggerFactory.getLogger(javaClass)
 
 
     suspend fun opprettMeldingIEFormidling(

@@ -121,13 +121,6 @@ class EFormidlingClient {
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonIgnoreUnknownKeys
-data class EFormidlingApiPayload<T>(
-    val content: List<T>,
-)
-
-@OptIn(ExperimentalSerializationApi::class)
-@Serializable
-@JsonIgnoreUnknownKeys
 data class EFormidlingErrorResponse(
     val timestamp: String,
     val status: Int,
