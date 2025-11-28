@@ -1,4 +1,4 @@
-val ktorVersion = "3.3.2"
+val ktorVersion = "3.3.3"
 
 plugins {
     val kotlinVersion = "2.2.21"
