@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="nb">
+  <head>
+    <meta
+      name="viewport"
+      content="width&#61;device-width, initial-scale&#61;1"
+    />
+    <meta charset="UTF-8" />
+    <title>Registrer mangelfulle opplysninger i Eiendomsregisteret</title>
+    <style>
+      div,
+      span,
+      p,
+      a,
+      img,
+      table {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        vertical-align: baseline;
+      }
+
+      thead,
+      tbody,
+      tfoot {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        vertical-align: middle;
+      }
+
+      td,
+      th,
+      tr {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        vertical-align: inherit;
+      }
+
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 17px;
+        line-height: 1.5;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #000000;
+        background-color: #ffffff;
+        border-bottom: 18px solid #156630;
+        padding-bottom: 2rem;
+      }
+
+      .logo {
+        margin-bottom: 18px;
+      }
+
+      a:link, a:visited {
+        color: #156630;
+      }
+      
+
+      .wrapper {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .paragraph {
+        display: block;
+        margin-top: 1rem;
+      }
+
+      .footer {
+        padding: 1rem;
+        display: block;
+      }
+
+      .header {
+        margin-bottom: 15px;
+      }
+
+      .header__text,
+      .header img {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .header .header__text {
+        font-size: 30px;
+        font-weight: bold;
+        margin-left: 5px;
+      }
+
+      .heading {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 0.7rem;
+      }
+
+      .sub-heading {
+        font-size: 20px;
+        line-height: 1.3;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      .content {
+        clear: both;
+        padding: 1rem 1rem 0.2rem 1rem;
+        margin-top: 1rem;
+      }
+
+      .cta-box {
+        background: #d0ecd6;
+        padding: 16px;
+        border-radius: 6px;
+      }
+
+      p {
+        margin-bottom: 16px;
+      }
+
+      table th {
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <img
+          alt="Kartverket sin logo"
+          class="logo"
+          style="height: 58px"
+          src="data:image/png;base64,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"
+        />
+      </div>
+      <div>
+        <div class="heading">
+          Registrer opplysninger i Eiendomsregisteret
+        </div>
+        <div class="cta-box">
+          <p>
+            Kartverket kan ha mangelfulle opplysninger om din bolig eller
+            fritidsbolig i Tønsberg kommune. Som eier eller fester kan du nå
+            registrere opplysninger i Eiendomsregisteret.
+          </p>
+
+          <p>
+            Riktige opplysninger gir bedre tjenester og trygghet for deg som
+            eier.
+          </p>
+
+          <a href="https://mineiendom.kartverket.no/egenregistreringer"
+            >Logg inn og kom i gang</a
+          >
+        </div>
+
+        <div class="content">
+          <div class="sub-heading">Hvorfor bør du egenregistrere?</div>
+          <p>
+            Eiendomsregisteret er det offisielle registeret over alle norske
+            eiendommer. Det er fra før registrert en del informasjon om din
+            eiendom, men denne kan være mangelfull eller utdatert.
+          </p>
+          <p>
+            Opplysningene brukes i samfunnskritiske tjenester fra offentlige og
+            private aktører:
+          </p>
+          <ul>
+            <li>
+              <b>Lån og forsikring:</b> Banker og forsikringsselskaper henter
+              opplysninger for å sikre at du får riktige betingelser.
+            </li>
+            <li>
+              <b>Kjøp og salg:</b> Korrekte opplysninger gir en tryggere salgsprosess
+              og lavere risiko for uenigheter i etterkant.
+            </li>
+            <li>
+              <b>Skatt og avgifter:</b> Hvis opplysningene dine i Eiendomsregisteret er
+              feil, kan du ende opp med å betale for mye i skatter og avgifter.
+            </li>
+          </ul>
+        </div>
+        <div class="content">
+          <div class="sub-heading">Hvordan egenregistrerer du?</div>
+          <p>
+            Ved å logge inn på Eiendomsregisteret kan du se opplysninger om dine eiendommer og begynne egenregistrering. I første omgang kan du registrere byggeår, vann, avløp, energi, oppvarming og bruksareal om din bolig eller fritidsbolig i Tønsberg kommune. 
+          </p>
+          <p>
+            Du kan finne opplysningene i eksempelvis salgsoppgaver, takstrapporter eller bruke din egen kjennskap til boligen. Du vil ikke bli bedt om å laste opp dokumentasjon. 
+          </p>
+          <p>Det er frivillig å registrere de seks opplysningene, og vi trenger bare at én eier gjennomfører registreringen.</p>
+        </div>
+                <div class="content">
+          <p>
+            Takk for at du bidrar.</p>
+            <p>
+                Hilsen Kartverket
+            </p>
+                      <a href="https://mineiendom.kartverket.no/egenregistreringer"
+            >Logg inn og kom i gang</a
+          >
+        </div>
+    </div>
+  </body>
+</html>
