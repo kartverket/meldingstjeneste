@@ -22,6 +22,8 @@ fun Application.eFormidlingroutes(eFormidlingService: eFormidlingService) {
                 )
             }
 
+            logger.info("Sender melding til eFormidling for ${mottakere.size} mottakere")
+
             mottakere.forEach { mottaker ->
                 try {
                     eFormidlingService.sendMelding(mottaker)
@@ -29,11 +31,12 @@ fun Application.eFormidlingroutes(eFormidlingService: eFormidlingService) {
 
                 catch (e: Exception) {
                     logger.error("Kunne ikke sende melding", e)
+                    throw e
                 }
 
             }
 
-
+            logger.info("Ferdig med å sende meldinger til eFormidling")
             // TODO - lage coroutine async for å besvare endepunkt raskere
             call.respond("Melding sendt til eFormidling")
         }

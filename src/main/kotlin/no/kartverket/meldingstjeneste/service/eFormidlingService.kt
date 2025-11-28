@@ -5,11 +5,13 @@ import no.kartverket.meldingstjeneste.clients.EFormidlingClient
 import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
+import org.slf4j.LoggerFactory
 
 
 class eFormidlingService {
 
     private val eFormidlingClient = EFormidlingClient()
+    val logger = LoggerFactory.getLogger(javaClass)
 
 
     suspend fun opprettMeldingIEFormidling(
@@ -40,7 +42,7 @@ class eFormidlingService {
         val html = this::class.java.classLoader.getResource("varsel.html")?.readBytes()
             ?: throw IllegalStateException("Fant ikke varsel.html i resources")
 
-        eFormidlingClient.uploadFile(meldingId, html, "varsel.html", "Registrer opplysninger i Eiendomsregisteret")
+        eFormidlingClient.uploadHtmlFile(meldingId, html, "varsel.html", "Registrer opplysninger i Eiendomsregisteret")
     }
 
 

@@ -1,13 +1,9 @@
 package no.kartverket.meldingstjeneste.clients
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
-import kotlinx.serialization.json.jsonObject
 import java.util.UUID
 
 
@@ -48,22 +44,8 @@ fun createStandardBusinessDocument(
         )
     )
 
-    return when (documentType.type) {
-        DocumentTypeStandard.PRINT -> StandardBusinessDocument.PrintSbd(
-            standardBusinessDocumentHeader = header,
-            print = PrintPayload(
-                hoveddokument = "varsel.html",
-                mottaker = Postadresse(
-                    navn = capability.postAddress!!.name,
-                    adresselinje1 = capability.postAddress.street,
-                    postnummer = capability.postAddress.postalCode,
-                    poststed = capability.postAddress.postalArea,
-                    land = capability.postAddress.country
-                ),
-            )
-        )
 
-        DocumentTypeStandard.DIGITAL -> StandardBusinessDocument.DigitalSbd(
+       return StandardBusinessDocument(
             standardBusinessDocumentHeader = header,
             digital = DigitalPostPayload(
                 sikkerhetsnivaa = 3,
@@ -75,58 +57,17 @@ fun createStandardBusinessDocument(
                 )
             )
         )
-
-        DocumentTypeStandard.ARKIVMELDING -> StandardBusinessDocument.ArkivmeldingSbd(
-            standardBusinessDocumentHeader = header,
-            arkivmelding = ArkivmeldingPayload(
-                dpv = Dpv(
-                    varselType = "VarselDPVMedRevarsel",
-                    varselTransportType = "EpostOgSMS"
-                )
-            )
-        )
-
-        else -> error("Ukjent dokumenttype '${documentType.type}' for mottaker")
-    }
 }
 
 /**
  * Fra Digdirs standard for business dokumenter:
  * https://docs.digdir.no/docs/eFormidling/Utvikling/Dokumenttyper/standard_sbd
  */
-@Serializable(with = SbdSerializer::class)
-sealed class StandardBusinessDocument {
-    abstract val standardBusinessDocumentHeader: StandardBusinessDocumentHeader
-
-    @Serializable
-    data class DigitalSbd(
-        override val standardBusinessDocumentHeader: StandardBusinessDocumentHeader,
-        val digital: DigitalPostPayload,
-    ) : StandardBusinessDocument()
-
-    @Serializable
-    data class ArkivmeldingSbd(
-        override val standardBusinessDocumentHeader: StandardBusinessDocumentHeader,
-        val arkivmelding: ArkivmeldingPayload,
-    ) : StandardBusinessDocument()
-
-    @Serializable
-    data class PrintSbd(
-        override val standardBusinessDocumentHeader: StandardBusinessDocumentHeader,
-        val print: PrintPayload,
-    ) : StandardBusinessDocument()
-}
-
-object SbdSerializer : JsonContentPolymorphicSerializer<StandardBusinessDocument>(StandardBusinessDocument::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<StandardBusinessDocument> {
-        return when {
-            "digital" in element.jsonObject -> StandardBusinessDocument.DigitalSbd.serializer()
-            "print" in element.jsonObject -> StandardBusinessDocument.PrintSbd.serializer()
-            "arkivmelding" in element.jsonObject -> StandardBusinessDocument.ArkivmeldingSbd.serializer()
-            else -> error("Unknown type: $element")
-        }
-    }
-}
+@Serializable()
+data class StandardBusinessDocument (
+    val standardBusinessDocumentHeader: StandardBusinessDocumentHeader,
+    val digital: DigitalPostPayload,
+    )
 
 @Serializable
 data class StandardBusinessDocumentHeader(
@@ -151,50 +92,6 @@ data class DigitalPostPayload(
 data class DigitalPostInfo(
     val virkningsdato: String,
     val aapningskvittering: Boolean,
-)
-
-@Serializable
-data class ArkivmeldingPayload(
-    val dpv: Dpv,
-)
-
-@Serializable
-data class Dpv(
-    val varselType: String = "VarselDPVMedRevarsel",
-    val varselTransportType: String = "EpostOgSMS",
-)
-
-/**
- * Print payload
- */
-@Serializable
-@SerialName("printPayload")
-@OptIn(ExperimentalSerializationApi::class)
-@JsonIgnoreUnknownKeys // Fanger opp printinstruksjoner m.m.
-data class PrintPayload(
-    val hoveddokument: String,
-    val mottaker: Postadresse? = null,
-    val utskriftsfarge: String = "FARGE",
-    val posttype: String = "B_OEKONOMI",
-    val retur: Retur? = null,
-)
-
-@Serializable
-data class Retur(
-    val returhaandtering: String = "DIREKTE_RETUR",
-    val mottaker: Postadresse? = null,
-)
-
-@Serializable
-data class Postadresse(
-    val navn: String,
-    val adresselinje1: String? = null,
-    val adresselinje2: String? = null,
-    val adresselinje3: String? = null,
-    val adresselinje4: String? = null,
-    val postnummer: String? = null,
-    val poststed: String? = null,
-    val land: String? = null,
 )
 
 @Serializable
