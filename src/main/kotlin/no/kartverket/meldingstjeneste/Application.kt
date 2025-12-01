@@ -84,9 +84,8 @@ fun Application.module() {
 
     val orderService = OrderService() // Ensure this is initialized properly
     val eFormidlingService = eFormidlingService()
-    configureRouting(orderService, authConfig)
+    configureRouting(orderService,eFormidlingService, authConfig)
     configureValidation()
     configureStatusPage()
-    eFormidlingroutes(eFormidlingService)
     internalRoutes(metricsRegistry)
 }

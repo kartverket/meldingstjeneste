@@ -7,14 +7,14 @@ import io.ktor.server.routing.routing
 import kotlinx.serialization.Serializable
 import no.kartverket.meldingstjeneste.service.eFormidlingService
 import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 
 
-fun Application.eFormidlingroutes(eFormidlingService: eFormidlingService) {
-    routing {
-        post("eFormidling/send") {
-            val (identifikatorer) = call.receive<MeldingDTO>()
+fun Route.eFormidlingroutes(eFormidlingService: eFormidlingService) {
+        post("/eFormidling/send") {
+            val (tittel, melding, identifikatorer) = call.receive<MeldingDTO>()
 
             val mottakere = identifikatorer.map { id ->
                 FysiskPerson(
@@ -26,7 +26,7 @@ fun Application.eFormidlingroutes(eFormidlingService: eFormidlingService) {
 
             mottakere.forEach { mottaker ->
                 try {
-                    eFormidlingService.sendMelding(mottaker)
+                    eFormidlingService.sendMelding(mottaker, tittel, melding)
                 }
 
                 catch (e: Exception) {
@@ -40,10 +40,11 @@ fun Application.eFormidlingroutes(eFormidlingService: eFormidlingService) {
             // TODO - lage coroutine async for å besvare endepunkt raskere
             call.respond("Melding sendt til eFormidling")
         }
-    }
 }
 
 @Serializable
 data class MeldingDTO(
+    val tittel: String,
+    val melding: String,
     val identifikatorer: List<String>,
 )

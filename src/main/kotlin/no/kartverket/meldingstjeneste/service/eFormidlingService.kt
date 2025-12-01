@@ -5,6 +5,7 @@ import no.kartverket.meldingstjeneste.clients.EFormidlingClient
 import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
+import no.kartverket.meldingstjeneste.logger
 import org.slf4j.LoggerFactory
 
 
@@ -15,7 +16,7 @@ class eFormidlingService {
 
     suspend fun opprettMeldingIEFormidling(
         mottaker: FysiskPerson
-    ): EFormidlingMeldingId {
+    ): EFormidlingMeldingId? {
 
 
         val capabilitiesResponse = eFormidlingClient.getCapabilities(mottaker)
@@ -25,7 +26,8 @@ class eFormidlingService {
         }
 
         if (capability.documentTypes.first().type == DocumentTypeStandard.PRINT) {
-            throw IllegalArgumentException("Mottaker støtter kun print")
+            logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
+            return null
         }
         val sbd = createStandardBusinessDocument(mottaker, capability)
 
@@ -37,25 +39,22 @@ class eFormidlingService {
 
     suspend fun lastOppMeldingsInnhold(
         meldingId: EFormidlingMeldingId,
+        tittel: String,
+        document: String,
     ) {
-        val html = this::class.java.classLoader.getResource("varsel.html")?.readBytes()
-            ?: throw IllegalStateException("Fant ikke varsel.html i resources")
 
-        eFormidlingClient.uploadHtmlFile(meldingId, html, "varsel.html", "Registrer opplysninger i Eiendomsregisteret")
+        eFormidlingClient.uploadHtmlFile(meldingId, document.toByteArray(), "varsel.html", tittel)
     }
 
 
-    suspend fun sendMelding(mottaker: FysiskPerson) {
+    suspend fun sendMelding(mottaker: FysiskPerson, tittel: String, document: String) {
+        val meldingId = opprettMeldingIEFormidling(mottaker)
 
-        try {
-            val meldingId = opprettMeldingIEFormidling(mottaker)
-            lastOppMeldingsInnhold(meldingId)
-
+        if (meldingId != null) {
+            lastOppMeldingsInnhold(meldingId, tittel, document)
             eFormidlingClient.sendMessage(meldingId)
-        } catch (e: Exception) {
-            throw e
-
         }
+
     }
 
 }
