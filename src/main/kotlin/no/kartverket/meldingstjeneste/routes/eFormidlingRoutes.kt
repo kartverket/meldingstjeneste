@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import no.kartverket.meldingstjeneste.service.eFormidlingService
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import kotlinx.coroutines.launch
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 
@@ -24,21 +25,20 @@ fun Route.eFormidlingroutes(eFormidlingService: eFormidlingService) {
 
             logger.info("Sender melding til eFormidling for ${mottakere.size} mottakere")
 
-            mottakere.forEach { mottaker ->
-                try {
-                    eFormidlingService.sendMelding(mottaker, tittel, melding)
-                }
+            call.application.launch {
+                mottakere.forEach { mottaker ->
+                    try {
+                        eFormidlingService.sendMelding(mottaker, tittel, melding)
+                    } catch (e: Exception) {
+                        logger.error("Kunne ikke sende melding", e)
+                        throw e
+                    }
 
-                catch (e: Exception) {
-                    logger.error("Kunne ikke sende melding", e)
-                    throw e
-                }
+                } }
 
-            }
 
-            logger.info("Ferdig med å sende meldinger til eFormidling")
-            // TODO - lage coroutine async for å besvare endepunkt raskere
-            call.respond("Melding sendt til eFormidling")
+            logger.info("Startet med å sende meldinger til eFormidling")
+            call.respond("Sender meldinger")
         }
 }
 
