@@ -1,11 +1,9 @@
 package no.kartverket.meldingstjeneste.routes
 
-import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.routing.post
-import io.ktor.server.routing.routing
 import kotlinx.serialization.Serializable
-import no.kartverket.meldingstjeneste.service.eFormidlingService
+import no.kartverket.meldingstjeneste.service.EFormidlingService
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.coroutines.launch
@@ -13,7 +11,8 @@ import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 
 
-fun Route.eFormidlingroutes(eFormidlingService: eFormidlingService) {
+fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
+        var antallSendt = 0
         post("/eFormidling/send") {
             val (tittel, melding, identifikatorer) = call.receive<MeldingDTO>()
 
@@ -28,13 +27,20 @@ fun Route.eFormidlingroutes(eFormidlingService: eFormidlingService) {
             call.application.launch {
                 mottakere.forEach { mottaker ->
                     try {
-                        eFormidlingService.sendMelding(mottaker, tittel, melding)
+                        val ok = eFormidlingService.sendMelding(mottaker, tittel, melding)
+
+                        if (ok) {
+                            antallSendt++
+                        }
+
                     } catch (e: Exception) {
                         logger.error("Kunne ikke sende melding", e)
                         throw e
                     }
 
-                } }
+                }
+                logger.info("Sendte $antallSendt av ${mottakere.size} meldinger")
+            }
 
 
             logger.info("Startet med å sende meldinger til eFormidling")

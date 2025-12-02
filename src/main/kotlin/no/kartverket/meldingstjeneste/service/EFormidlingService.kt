@@ -6,10 +6,9 @@ import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
 import no.kartverket.meldingstjeneste.logger
-import org.slf4j.LoggerFactory
 
 
-class eFormidlingService {
+class EFormidlingService {
 
     private val eFormidlingClient = EFormidlingClient()
 
@@ -47,14 +46,16 @@ class eFormidlingService {
     }
 
 
-    suspend fun sendMelding(mottaker: FysiskPerson, tittel: String, document: String) {
+    suspend fun sendMelding(mottaker: FysiskPerson, tittel: String, document: String): Boolean {
         val meldingId = opprettMeldingIEFormidling(mottaker)
 
         if (meldingId != null) {
             lastOppMeldingsInnhold(meldingId, tittel, document)
-            eFormidlingClient.sendMessage(meldingId)
+            return eFormidlingClient.sendMessage(meldingId)
+
         }
 
+        return false
     }
 
 }

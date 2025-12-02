@@ -103,13 +103,16 @@ class EFormidlingClient {
 
 
 
-    suspend fun sendMessage(eFormidlingMeldingId: EFormidlingMeldingId) {
+    suspend fun sendMessage(eFormidlingMeldingId: EFormidlingMeldingId): Boolean {
         val res = client.post("$eFormidlingURL/messages/out/$eFormidlingMeldingId")
         if (!res.status.isSuccess()) {
             val msg = "Sending av melding feilet – ${res.status} – ${res.bodyAsText()}"
             logger.error(msg)
             throw RuntimeException(msg)
         }
+
+        return true
+
     }
 
 

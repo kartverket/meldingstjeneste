@@ -23,9 +23,8 @@ import no.kartverket.meldingstjeneste.plugins.configureRouting
 import no.kartverket.meldingstjeneste.plugins.configureStatusPage
 import no.kartverket.meldingstjeneste.plugins.configureSwagger
 import no.kartverket.meldingstjeneste.plugins.configureValidation
-import no.kartverket.meldingstjeneste.routes.eFormidlingroutes
 import no.kartverket.meldingstjeneste.service.OrderService
-import no.kartverket.meldingstjeneste.service.eFormidlingService
+import no.kartverket.meldingstjeneste.service.EFormidlingService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -83,7 +82,7 @@ fun Application.module() {
     configureSwagger()
 
     val orderService = OrderService() // Ensure this is initialized properly
-    val eFormidlingService = eFormidlingService()
+    val eFormidlingService = EFormidlingService()
     configureRouting(orderService,eFormidlingService, authConfig)
     configureValidation()
     configureStatusPage()

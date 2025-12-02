@@ -13,11 +13,11 @@ import no.kartverket.meldingstjeneste.routes.authConfigRoute
 import no.kartverket.meldingstjeneste.routes.eFormidlingroutes
 import no.kartverket.meldingstjeneste.routes.orderRoutes
 import no.kartverket.meldingstjeneste.service.OrderService
-import no.kartverket.meldingstjeneste.service.eFormidlingService
+import no.kartverket.meldingstjeneste.service.EFormidlingService
 
 fun Application.configureRouting(
     orderService: OrderService,
-    eFormidlingService: eFormidlingService,
+    eFormidlingService: EFormidlingService,
     authConfig: AuthConfig,
 ) {
     routing {
