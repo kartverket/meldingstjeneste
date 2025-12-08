@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 import io.ktor.server.routing.get
-import no.kartverket.meldingstjeneste.clients.Meldingstatus
 
 
 fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
@@ -22,7 +21,7 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
                 FysiskPerson(
                     identifikator = id
                 )
-            }
+            }.toSet()
 
             logger.info("Sender melding til eFormidling for ${mottakere.size} mottakere")
 
