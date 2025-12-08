@@ -7,11 +7,9 @@ import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
 import no.kartverket.meldingstjeneste.logger
 
-
 class EFormidlingService {
 
     private val eFormidlingClient = EFormidlingClient()
-
 
     suspend fun opprettMeldingIEFormidling(
         mottaker: FysiskPerson
@@ -41,7 +39,6 @@ class EFormidlingService {
         tittel: String,
         document: String,
     ) {
-
         eFormidlingClient.uploadHtmlFile(meldingId, document.toByteArray(), "varsel.html", tittel)
     }
 
