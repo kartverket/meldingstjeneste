@@ -1,9 +1,11 @@
 package no.kartverket.meldingstjeneste.service
 
+import no.kartverket.meldingstjeneste.clients.ConversationDTO
 import no.kartverket.meldingstjeneste.clients.DocumentTypeStandard
 import no.kartverket.meldingstjeneste.clients.EFormidlingClient
 import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
+import no.kartverket.meldingstjeneste.clients.Meldingstatus
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
 import no.kartverket.meldingstjeneste.logger
 
@@ -54,5 +56,28 @@ class EFormidlingService {
 
         return false
     }
+
+    suspend fun hentMottakereMedVellykketLevering(datolevert: String): List<ConversationDTO> {
+        val res = eFormidlingClient.getOutgoingConversations("Melding om egenregistrering")
+
+        val vellykketLevertMottakere = res.content
+            .filter { conversation ->
+                conversation.messageStatuses.any { statusDTO ->
+                    statusDTO.status == Meldingstatus.LEVERT
+                }
+            }
+            .filter { conversationDTO ->
+                if (datolevert.isNotBlank()) {
+                    conversationDTO.messageStatuses.any { status ->
+                        status.status === Meldingstatus.LEVERT && status.lastUpdate.startsWith(datolevert)
+                    }
+                } else {
+                    true
+                }
+            }
+
+        return vellykketLevertMottakere
+    }
+
 
 }

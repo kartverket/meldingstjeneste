@@ -1,5 +1,6 @@
 package no.kartverket.meldingstjeneste.clients
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,6 +15,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import java.time.OffsetDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -21,6 +23,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 import no.kartverket.meldingstjeneste.env
 import org.slf4j.LoggerFactory
+import tools.jackson.databind.node.StringNode
 
 class EFormidlingClient {
     private val logger = LoggerFactory.getLogger(EFormidlingClient::class.java)
@@ -115,6 +118,20 @@ class EFormidlingClient {
 
     }
 
+    suspend fun getOutgoingConversations(messageTitle: String): EFormidlingApiPayload<ConversationDTO> {
+        val res = client.get("$eFormidlingURL/conversations?messageTitle=${messageTitle}&size=2000000")
+
+        if (!res.status.isSuccess()) {
+            val msg = "Kall til utgående meldinger feilet – status=${res.status} – ${res.bodyAsText()}"
+            logger.error(msg)
+            throw IllegalStateException(msg)
+        }
+
+        val response = Json.decodeFromString<EFormidlingApiPayload<ConversationDTO>>(res.bodyAsText())
+
+        return response
+    }
+
 
 
 
@@ -133,3 +150,45 @@ data class EFormidlingErrorResponse(
     val path: String,
     val description: String? = null,
 )
+
+enum class Meldingstatus(val status: String) {
+    OPPRETTET("OPPRETTET"),
+    SENDT("SENDT"),
+    MOTTATT("MOTTATT"),
+    LEVERT("LEVERT"),
+    LEST("LEST"),
+    FEIL("FEIL"),
+    ANNET("ANNET"),
+    INNKOMMENDE_MOTTATT("INNKOMMENDE_MOTTATT"),
+    INNKOMMENDE_LEVERT("INNKOMMENDE_LEVERT"),
+    LEVETID_UTLOPT("LEVETID_UTLOPT");
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonIgnoreUnknownKeys
+data class EFormidlingApiPayload<T>(
+    val content: List<T>,
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonIgnoreUnknownKeys
+data class StatusDTO(
+    val id: Int,
+    val lastUpdate: String,
+    val status: Meldingstatus,
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonIgnoreUnknownKeys
+data class ConversationDTO(
+    val receiver: Fnr,
+    val messageTitle: String,
+    val processIdentifier: String,
+    val messageStatuses: List<StatusDTO>,
+    val lastUpdate: String
+)
+
+typealias Fnr = String

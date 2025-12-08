@@ -37,6 +37,8 @@ val env =
 val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
 val environment: String = env["ENVIRONMENT"]
 val port = if (environment == "localhost") 8079 else 8080
+const val SENDER_REF_ID = "b7b1f7a7-6f4a-4d0c-9f6e-6b8f2c3e9a41"
+
 
 fun main() {
     embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)

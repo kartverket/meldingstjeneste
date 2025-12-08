@@ -9,6 +9,8 @@ import io.ktor.server.routing.Route
 import kotlinx.coroutines.launch
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
+import io.ktor.server.routing.get
+import no.kartverket.meldingstjeneste.clients.Meldingstatus
 
 
 fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
@@ -46,6 +48,23 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
             logger.info("Startet med å sende meldinger til eFormidling")
             call.respond("Sender meldinger")
         }
+
+
+        get("/eFormidling/result") {
+            val params = call.request.queryParameters
+            val datolevert = params["dato"]!!
+           val vellykkedeutsendinger =  eFormidlingService.hentMottakereMedVellykketLevering(datolevert)
+            call.respond(vellykkedeutsendinger)
+        }
+    get("/eFormidling/result/fnr") {
+        val params = call.request.queryParameters
+        val datolevert = params["dato"]!!
+        val vellykkedeutsendinger =  eFormidlingService.hentMottakereMedVellykketLevering(datolevert).map { conversationDTO -> conversationDTO.receiver }.toSet()
+
+        call.respond(vellykkedeutsendinger)
+
+    }
+
 }
 
 @Serializable

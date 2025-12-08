@@ -5,9 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import java.util.UUID
-
-
-const val SENDER_REF_ID = "b7b1f7a7-6f4a-4d0c-9f6e-6b8f2c3e9a41"
+import no.kartverket.meldingstjeneste.SENDER_REF_ID
 
 
 fun createStandardBusinessDocument(
@@ -50,7 +48,7 @@ fun createStandardBusinessDocument(
             digital = DigitalPostPayload(
                 sikkerhetsnivaa = 3,
                 hoveddokument = "varsel.html",
-                tittel = "Melding om egenregistrering",
+                tittel = "Melding om egenregistrering", // Endrer du denne tittelen vil det får konsekvenser for eFormidlingClient.getOutgoingConversations()
                 digitalPostInfo = DigitalPostInfo(
                     virkningsdato = "2025-01-01",
                     aapningskvittering = true
