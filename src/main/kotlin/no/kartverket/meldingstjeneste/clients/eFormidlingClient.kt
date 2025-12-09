@@ -43,7 +43,7 @@ class EFormidlingClient {
         val res = client.get("$eFormidlingURL/capabilities/${mottaker.identifikator}?process=${mottaker.prosessType}")
         if (!res.status.isSuccess()) {
             val error = res.body<EFormidlingErrorResponse>()
-            logger.error("Error while getting capabilities", error.error)
+            logger.error("Error while getting capabilities: ${error.error}")
             throw IllegalArgumentException("Kall til capabilities feilet")
         }
 
@@ -119,17 +119,25 @@ class EFormidlingClient {
     }
 
     suspend fun getOutgoingConversations(messageTitle: String): EFormidlingApiPayload<ConversationDTO> {
-        val res = client.get("$eFormidlingURL/conversations?messageTitle=${messageTitle}&size=2000000")
+        var page = 0
+        var response: EFormidlingApiPayload<ConversationDTO>
+        val content = buildList {
+            do {
+                val res = client.get("$eFormidlingURL/conversations?messageTitle=${messageTitle}&size=2000&page=${page}")
 
-        if (!res.status.isSuccess()) {
-            val msg = "Kall til utgående meldinger feilet – status=${res.status} – ${res.bodyAsText()}"
-            logger.error(msg)
-            throw IllegalStateException(msg)
+                if (!res.status.isSuccess()) {
+                    val msg = "Kall til utgående meldinger feilet – status=${res.status} – ${res.bodyAsText()}"
+                    logger.error(msg)
+                    throw IllegalStateException(msg)
+                }
+
+                response = res.body<EFormidlingApiPayload<ConversationDTO>>()
+                addAll(response.content)
+                page += 1
+            } while (!response.last)
         }
 
-        val response = Json.decodeFromString<EFormidlingApiPayload<ConversationDTO>>(res.bodyAsText())
-
-        return response
+        return EFormidlingApiPayload(content = content, last = true)
     }
 
 
@@ -169,6 +177,7 @@ enum class Meldingstatus(val status: String) {
 @JsonIgnoreUnknownKeys
 data class EFormidlingApiPayload<T>(
     val content: List<T>,
+    val last: Boolean,
 )
 
 @OptIn(ExperimentalSerializationApi::class)
