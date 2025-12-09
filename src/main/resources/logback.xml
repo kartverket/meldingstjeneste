@@ -10,4 +10,5 @@
     <root level="INFO">
         <appender-ref ref="${LOG_APPENDER:-STDOUT_JSON}"/>
     </root>
+    <logger name="io.ktor.server.plugins.cors" level="WARN" />
 </configuration>
