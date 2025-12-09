@@ -13,7 +13,6 @@ import io.ktor.server.routing.get
 
 
 fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
-        var antallSendt = 0
         post("/eFormidling/send") {
             val (tittel, melding, identifikatorer) = call.receive<MeldingDTO>()
 
@@ -26,6 +25,7 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
             logger.info("Sender melding til eFormidling for ${mottakere.size} mottakere")
 
             call.application.launch {
+                var antallSendt = 0
                 mottakere.forEach { mottaker ->
                     try {
                         val ok = eFormidlingService.sendMelding(mottaker, tittel, melding)
