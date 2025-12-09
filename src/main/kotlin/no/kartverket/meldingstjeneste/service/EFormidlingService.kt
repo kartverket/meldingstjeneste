@@ -60,21 +60,12 @@ class EFormidlingService {
     suspend fun hentMottakereMedVellykketLevering(datolevert: String): List<ConversationDTO> {
         val res = eFormidlingClient.getOutgoingConversations("Melding om egenregistrering")
 
-        val vellykketLevertMottakere = res.content
-            .filter { conversation ->
-                conversation.messageStatuses.any { statusDTO ->
-                    statusDTO.status == Meldingstatus.LEVERT
-                }
+        val vellykketLevertMottakere = res.content.filter { conversation ->
+            conversation.messageStatuses.any {
+                it.status == Meldingstatus.LEVERT &&
+                        it.lastUpdate.startsWith(datolevert)
             }
-            .filter { conversationDTO ->
-                if (datolevert.isNotBlank()) {
-                    conversationDTO.messageStatuses.any { status ->
-                        status.status === Meldingstatus.LEVERT && status.lastUpdate.startsWith(datolevert)
-                    }
-                } else {
-                    true
-                }
-            }
+        }
 
         return vellykketLevertMottakere
     }
