@@ -46,7 +46,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.5.23")
+    implementation("ch.qos.logback:logback-classic:1.5.24")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
