@@ -8,9 +8,11 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import no.kartverket.meldingstjeneste.clients.EFormidlingServerException
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 import no.kartverket.meldingstjeneste.service.EFormidlingService
+import no.kartverket.meldingstjeneste.service.MissingCapabilitiesException
 
 
 fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
@@ -56,15 +58,28 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
             identifikator = identifikator
         )
 
-       val ok = eFormidlingService.sendMelding(fysiskPerson, tittel, melding)
-
-        if (ok) {
+        try {
+            eFormidlingService.sendMelding(fysiskPerson, tittel, melding)
             call.respond(HttpStatusCode.OK)
-        } else {
-            logger.error("Feil ved sending av melding til eFormidling")
-            call.respond(HttpStatusCode.BadRequest, "Feil ved sending av melding")
         }
 
+        catch (e: Exception) {
+
+            when (e) {
+                is EFormidlingServerException -> {
+                    logger.error("eFormidling sendte en serverfeil. Sending av melding kan sannsynligvis prøves igjen senere.", e)
+                    call.respond(HttpStatusCode.InternalServerError, APIErrorResponse(APIErrorType.SERVER_FEIL, "eFormidling sendte en serverfeil. Melding kan sannsynligvis prøves igjen senere") )
+                }
+                is MissingCapabilitiesException -> {
+                    logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
+                    call.respond(HttpStatusCode.BadRequest, APIErrorResponse(APIErrorType.MOTTAKER_MANGLER_DIGITAL_CAPABILITY,"Bruker mangler digitial capability: ${e.message}"))
+                }
+
+                else -> {
+                    logger.error("Uventet feil ved sending til eFormidling", e)
+                    call.respond(HttpStatusCode.InternalServerError, APIErrorResponse(APIErrorType.SERVER_FEIL, "Uventet feil ved sending til eFormidling"))}
+            }
+        }
 
     }
 
@@ -100,4 +115,16 @@ data class MeldingSingleDTO(
     val melding: String,
     val identifikator: String,
 )
+
+@Serializable
+data class APIErrorResponse(
+    val error: APIErrorType,
+    val message: String,
+)
+
+@Serializable
+enum class APIErrorType(val type: String) {
+    SERVER_FEIL("GENERELL_FEIL"),
+    MOTTAKER_MANGLER_DIGITAL_CAPABILITY("MOTTAKER_MANGLER_DIGITAL_CAPABILITY"),
+}
 

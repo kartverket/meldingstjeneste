@@ -1,6 +1,5 @@
 package no.kartverket.meldingstjeneste.clients
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -15,15 +14,12 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import java.time.OffsetDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
-
 import no.kartverket.meldingstjeneste.env
 import org.slf4j.LoggerFactory
-import tools.jackson.databind.node.StringNode
 
 class EFormidlingClient {
     private val logger = LoggerFactory.getLogger(EFormidlingClient::class.java)
@@ -44,7 +40,8 @@ class EFormidlingClient {
         if (!res.status.isSuccess()) {
             val error = res.body<EFormidlingErrorResponse>()
             logger.error("Error while getting capabilities: ${error.error}")
-            throw IllegalArgumentException("Kall til capabilities feilet")
+
+            throw EFormidlingServerException("Kall til capabilities feilet")
         }
 
         val responseBody = res.body<Capabilities>()
@@ -73,7 +70,7 @@ class EFormidlingClient {
             when (val exceptionType = error.exception.split('.').last()) {
                 "MissingAddressInformationException" -> throw IllegalArgumentException("Feil mot eFormidling")
                 "ServiceNotEnabledException" -> throw IllegalArgumentException("Feil mot eFormidling")
-                else -> throw RuntimeException("${error.message} ($exceptionType)")
+                else -> throw EFormidlingServerException("${error.message} ($exceptionType)")
             }
         }
         val response = res.body<StandardBusinessDocument>()
@@ -100,7 +97,8 @@ class EFormidlingClient {
         if (!res.status.isSuccess()) {
             val msg = "Opplasting av fil feilet – ${res.status} – ${res.bodyAsText()}"
             logger.error(msg)
-            throw RuntimeException(msg)
+
+            throw EFormidlingServerException(msg)
         }
     }
 
@@ -111,7 +109,8 @@ class EFormidlingClient {
         if (!res.status.isSuccess()) {
             val msg = "Sending av melding feilet – ${res.status} – ${res.bodyAsText()}"
             logger.error(msg)
-            throw RuntimeException(msg)
+
+            throw EFormidlingServerException(msg)
         }
 
         return true
@@ -199,5 +198,7 @@ data class ConversationDTO(
     val messageStatuses: List<StatusDTO>,
     val lastUpdate: String
 )
+
+class EFormidlingServerException(message: String): Exception(message)
 
 typealias Fnr = String

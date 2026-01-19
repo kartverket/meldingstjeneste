@@ -15,18 +15,18 @@ class EFormidlingService {
 
     suspend fun opprettMeldingIEFormidling(
         mottaker: FysiskPerson
-    ): EFormidlingMeldingId? {
+    ): EFormidlingMeldingId {
 
 
         val capabilitiesResponse = eFormidlingClient.getCapabilities(mottaker)
 
         val capability = capabilitiesResponse.firstOrNull() ?: run {
-            throw IllegalArgumentException("Ingen capabilities")
+            throw MissingCapabilitiesException("Ingen capabilities")
         }
 
         if (capability.documentTypes.first().type == DocumentTypeStandard.PRINT) {
             logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
-            return null
+            throw MissingCapabilitiesException("Mottaker har ikke digital capability")
         }
         val sbd = createStandardBusinessDocument(mottaker, capability)
 
@@ -48,13 +48,8 @@ class EFormidlingService {
     suspend fun sendMelding(mottaker: FysiskPerson, tittel: String, document: String): Boolean {
         val meldingId = opprettMeldingIEFormidling(mottaker)
 
-        if (meldingId != null) {
-            lastOppMeldingsInnhold(meldingId, tittel, document)
-            return eFormidlingClient.sendMessage(meldingId)
-
-        }
-
-        return false
+        lastOppMeldingsInnhold(meldingId, tittel, document)
+        return eFormidlingClient.sendMessage(meldingId)
     }
 
     suspend fun hentMottakereMedVellykketLevering(datolevert: String): List<ConversationDTO> {
@@ -72,3 +67,5 @@ class EFormidlingService {
 
 
 }
+
+open class MissingCapabilitiesException(cause: String) :Exception(cause)
