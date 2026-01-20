@@ -69,7 +69,8 @@ class EFormidlingClient {
             val error = res.body<EFormidlingErrorResponse>()
             when (val exceptionType = error.exception.split('.').last()) {
                 "MissingAddressInformationException" -> throw IllegalArgumentException("Feil mot eFormidling")
-                "ServiceNotEnabledException" -> throw IllegalArgumentException("Feil mot eFormidling")
+                "ServiceNotEnabledException" -> throw IllegalArgumentException(error.message)
+                "IllegalArgumentException" -> throw IllegalArgumentException(error.message)
                 else -> throw EFormidlingServerException("${error.message} ($exceptionType)")
             }
         }

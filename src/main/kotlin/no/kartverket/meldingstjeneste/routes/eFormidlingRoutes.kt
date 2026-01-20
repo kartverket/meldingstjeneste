@@ -8,7 +8,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import no.kartverket.meldingstjeneste.clients.EFormidlingServerException
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.logger
 import no.kartverket.meldingstjeneste.service.EFormidlingService
@@ -66,13 +65,14 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
         catch (e: Exception) {
 
             when (e) {
-                is EFormidlingServerException -> {
-                    logger.error("eFormidling sendte en serverfeil. Sending av melding kan sannsynligvis prøves igjen senere.", e)
-                    call.respond(HttpStatusCode.InternalServerError, APIErrorResponse(APIErrorType.SERVER_FEIL, "eFormidling sendte en serverfeil. Melding kan sannsynligvis prøves igjen senere") )
-                }
                 is MissingDigitalCapabilitiesException -> {
                     logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
                     call.respond(HttpStatusCode.BadRequest, APIErrorResponse(APIErrorType.MOTTAKER_MANGLER_DIGITAL_CAPABILITY,"Bruker mangler digitial capability: ${e.message}"))
+                }
+
+                is IllegalArgumentException -> {
+                    logger.error("Feil ved sending til eFormidling: ${e.message}", e)
+                    call.respond(HttpStatusCode.BadRequest, APIErrorResponse(APIErrorType.KLIENT_FEIL, "Feil ved sending til eFormidling: ${e.message}"))
                 }
 
                 else -> {
@@ -125,6 +125,7 @@ data class APIErrorResponse(
 @Serializable
 enum class APIErrorType(val type: String) {
     SERVER_FEIL("GENERELL_FEIL"),
+    KLIENT_FEIL("KLIENT_FEIL"),
     MOTTAKER_MANGLER_DIGITAL_CAPABILITY("MOTTAKER_MANGLER_DIGITAL_CAPABILITY"),
 }
 
