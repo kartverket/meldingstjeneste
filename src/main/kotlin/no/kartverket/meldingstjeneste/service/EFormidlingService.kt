@@ -1,7 +1,6 @@
 package no.kartverket.meldingstjeneste.service
 
 import no.kartverket.meldingstjeneste.clients.ConversationDTO
-import no.kartverket.meldingstjeneste.clients.DocumentTypeStandard
 import no.kartverket.meldingstjeneste.clients.EFormidlingClient
 import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
@@ -21,12 +20,12 @@ class EFormidlingService {
         val capabilitiesResponse = eFormidlingClient.getCapabilities(mottaker)
 
         val capability = capabilitiesResponse.firstOrNull() ?: run {
-            throw MissingCapabilitiesException("Ingen capabilities")
+            throw MissingDigitalCapabilitiesException("Ingen capabilities")
         }
 
-        if (capability.documentTypes.first().type == DocumentTypeStandard.PRINT) {
+        if (capability.digitalPostAddress?.address == null && capability.serviceIdentifier == "DPI") {
             logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
-            throw MissingCapabilitiesException("Mottaker har ikke digital capability")
+            throw MissingDigitalCapabilitiesException("Mottaker har ikke digital capability")
         }
         val sbd = createStandardBusinessDocument(mottaker, capability)
 
@@ -68,4 +67,4 @@ class EFormidlingService {
 
 }
 
-open class MissingCapabilitiesException(cause: String) :Exception(cause)
+open class MissingDigitalCapabilitiesException(cause: String): Exception(cause)
