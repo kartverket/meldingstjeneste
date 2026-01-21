@@ -54,7 +54,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     // Entra-ID authentication
     implementation("com.microsoft.graph:microsoft-graph:6.60.0")
-    implementation("com.azure:azure-identity:1.18.1")
+    implementation("com.azure:azure-identity:1.18.2")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.3.0")
