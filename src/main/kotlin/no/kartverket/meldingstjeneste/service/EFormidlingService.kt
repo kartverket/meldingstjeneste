@@ -6,7 +6,6 @@ import no.kartverket.meldingstjeneste.clients.EFormidlingMeldingId
 import no.kartverket.meldingstjeneste.clients.FysiskPerson
 import no.kartverket.meldingstjeneste.clients.Meldingstatus
 import no.kartverket.meldingstjeneste.clients.createStandardBusinessDocument
-import no.kartverket.meldingstjeneste.logger
 
 class EFormidlingService {
 
@@ -19,14 +18,11 @@ class EFormidlingService {
 
         val capabilitiesResponse = eFormidlingClient.getCapabilities(mottaker)
 
-        val capability = capabilitiesResponse.firstOrNull() ?: run {
+        val capability = capabilitiesResponse.find { it.serviceIdentifier === "DPI" && it.digitalPostAddress?.address != null } ?: run {
             throw MissingDigitalCapabilitiesException("Ingen capabilities")
         }
 
-        if (capability.digitalPostAddress?.address == null && capability.serviceIdentifier == "DPI") {
-            logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
-            throw MissingDigitalCapabilitiesException("Mottaker har ikke digital capability")
-        }
+
         val sbd = createStandardBusinessDocument(mottaker, capability)
 
         val eFormidlingMeldingId = eFormidlingClient.createMessage(sbd)
