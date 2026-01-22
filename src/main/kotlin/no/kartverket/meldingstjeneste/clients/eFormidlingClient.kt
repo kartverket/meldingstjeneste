@@ -39,7 +39,7 @@ class EFormidlingClient {
         val res = client.get("$eFormidlingURL/capabilities/${mottaker.identifikator}?process=${mottaker.prosessType}")
         if (!res.status.isSuccess()) {
             val error = res.body<EFormidlingErrorResponse>()
-            logger.error("Error while getting capabilities: ${error.error}")
+            logger.error("Error while getting capabilities: $error")
 
             throw EFormidlingServerException("Kall til capabilities feilet")
         }

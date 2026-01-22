@@ -18,7 +18,7 @@ class EFormidlingService {
 
         val capabilitiesResponse = eFormidlingClient.getCapabilities(mottaker)
 
-        val capability = capabilitiesResponse.find { it.serviceIdentifier === "DPI" && it.digitalPostAddress?.address != null } ?: run {
+        val capability = capabilitiesResponse.find { it.serviceIdentifier == "DPI" && it.digitalPostAddress?.address != null } ?: run {
             throw MissingDigitalCapabilitiesException("Ingen capabilities")
         }
 
