@@ -1,10 +1,12 @@
 package no.kartverket.meldingstjeneste.plugins
 
-import io.ktor.server.application.*
-import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.ValidationResult
+import java.time.ZonedDateTime
 import no.kartverket.meldingstjeneste.model.NotificationChannel
 import no.kartverket.meldingstjeneste.model.OrderRequest
-import java.time.ZonedDateTime
 
 val nationalIdRegex = Regex("^\\d{11}$")
 
@@ -29,9 +31,9 @@ fun Application.configureValidation() {
                             && (smsTemplate == null || emailTemplate == null) ->
                         ValidationResult.Invalid("Both smsTemplate and emailTemplate are required for preferred distribution channels.")
 
-                    // Validering for SMS body-lengde. Tekstlengde over 157 vil telle som to transaksjoner med dobbel kostnad.
-                    (smsTemplate?.body?.length ?: 0) > 157 ->
-                        ValidationResult.Invalid("The SMS body should not exceed 157 characters.")
+                    // Validering for SMS body-lengde. Tekstlengde over 160 vil telle som to transaksjoner med dobbel kostnad.
+                    (smsTemplate?.body?.length ?: 0) > 160 ->
+                        ValidationResult.Invalid("The SMS body should not exceed 160 characters.")
 
                     else -> ValidationResult.Valid
                 }
