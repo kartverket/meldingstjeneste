@@ -47,11 +47,11 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.5.27")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:1.16.2")
-    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     // Entra-ID authentication
     implementation("com.microsoft.graph:microsoft-graph:6.60.0")
     implementation("com.azure:azure-identity:1.18.2")
