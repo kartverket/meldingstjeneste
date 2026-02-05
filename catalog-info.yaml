@@ -11,9 +11,9 @@ spec:
   owner: "egenregistrering"
   system: "egenreg"
   providesApis:
-  - "meldingstjeneste-api"
+    - "meldingstjeneste-api"
   consumesApis:
-    - "altinn-notifications"
+    - "api:external/altinn-notifications"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "API"
