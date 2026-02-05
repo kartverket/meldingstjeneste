@@ -12,6 +12,8 @@ spec:
   system: "egenreg"
   providesApis:
   - "meldingstjeneste-api"
+  consumesApis:
+    - "altinn-notifications"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "API"
@@ -23,8 +25,5 @@ spec:
   type: "openapi"
   lifecycle: "production"
   owner: "egenregistrering"
-  definition: |
-    openapi: "3.0.0"
-    info:
-        title: meldingstjeneste API
-    paths:
+  definition:
+    $text: https://meldingstjeneste.atgcp1-prod.kartverket-intern.cloud/api.json

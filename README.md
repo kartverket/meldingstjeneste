@@ -3,7 +3,7 @@ Tjenesten kobler seg opp mot [Altinns Notifications API](https://docs.altinn.stu
 Endepunktene til tjenesten er bygget ovenpå dette API-et.
 
 ## API-dokumentasjon
-Dette prosjektet bruker Swagger for å dokumentere API-et.
+Dette prosjektet bruker Swagger for å dokumentere API-et: https://meldingstjeneste.atgcp1-dev.kartverket-intern.cloud/swagger/index.html
 Når du kjører opp appen lokalt finner du denne dokumentasjonen på http://localhost:8080/swagger.
 
 
