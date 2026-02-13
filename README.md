@@ -1,11 +1,11 @@
-## Varslingstjeneste
-Tjenesten kobler seg opp mot [Altinns Notifications API](https://docs.altinn.studio/notifications/reference/api/). 
+## Meldingstjeneste
+Tjenesten kobler seg opp mot [Altinns Notifications API](https://docs.altinn.studio/nb/notifications/reference/api/) 
+og Kartverkets egen instans av [digdirs eFormidling](https://docs.digdir.no/docs/eFormidling/Introduksjon/). 
 Endepunktene til tjenesten er bygget ovenpå dette API-et.
 
 ## API-dokumentasjon
 Dette prosjektet bruker Swagger for å dokumentere API-et: https://meldingstjeneste.atgcp1-dev.kartverket-intern.cloud/swagger/index.html
-Når du kjører opp appen lokalt finner du denne dokumentasjonen på http://localhost:8080/swagger.
-
+Når du kjører opp appen lokalt finner du denne dokumentasjonen på http://localhost:8079/swagger.
 
 ## Kjøre med Docker
 Dersom man ikke har bygget Docker image må man gjøre dette først.
