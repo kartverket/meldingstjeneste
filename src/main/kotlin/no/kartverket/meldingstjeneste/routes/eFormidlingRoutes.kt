@@ -124,10 +124,10 @@ data class APIErrorResponse(
 )
 
 @Serializable
-enum class APIErrorType(val type: String) {
-    SERVER_FEIL("GENERELL_FEIL"),
-    KLIENT_FEIL("KLIENT_FEIL"),
-    MOTTAKER_MANGLER_DIGITAL_CAPABILITY("MOTTAKER_MANGLER_DIGITAL_CAPABILITY"),
+enum class APIErrorType() {
+    SERVER_FEIL,
+    KLIENT_FEIL,
+    MOTTAKER_MANGLER_DIGITAL_CAPABILITY,
 }
 
 private val sendBulkDoc: RouteConfig.() -> Unit = {
