@@ -16,6 +16,9 @@ fun Application.configureSwagger() {
             tag("Varslinger") {
                 description = "Endepunkter for utsending av varsler via Altinns varslingstjeneste"
             }
+            tag("eFormidling") {
+                description = "Endepunkter for utsending av meldinger via eFormidling"
+            }
         }
         security {
             securityScheme("entra") {
