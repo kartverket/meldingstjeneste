@@ -1,7 +1,7 @@
 val ktorVersion = "3.4.0"
 
 plugins {
-    val kotlinVersion = "2.3.10"
+    val kotlinVersion = "2.3.20"
 
     kotlin("jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
