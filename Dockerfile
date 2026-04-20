@@ -1,4 +1,5 @@
-FROM eclipse-temurin:21-jdk-alpine@sha256:df8ce8302ed2ed1690ef490c633981b07e752b373b5fdf796960fb2eb0d640ea
+FROM eclipse-temurin:21-jre-alpine-3.23@sha256:ad0cdd9782db550ca7dde6939a16fd850d04e683d37d3cff79d84a5848ba6a5a
+
 RUN apk update && apk upgrade
 
 ENV USER_ID=150 \
