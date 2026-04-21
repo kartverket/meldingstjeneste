@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre-alpine-3.23@sha256:ad0cdd9782db550ca7dde6939a16fd850d04e683d37d3cff79d84a5848ba6a5a
+FROM eclipse-temurin:24-jre-alpine-3.22@sha256:4044b6c87cb088885bcd0220f7dc7a8a4aab76577605fa471945d2e98270741f
 
 RUN apk update && apk upgrade
 
