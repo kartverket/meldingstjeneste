@@ -31,9 +31,9 @@ fun Application.configureValidation() {
                             && (smsTemplate == null || emailTemplate == null) ->
                         ValidationResult.Invalid("Both smsTemplate and emailTemplate are required for preferred distribution channels.")
 
-                    // Validering for SMS body-lengde. Tekstlengde over 160 vil telle som to transaksjoner med dobbel kostnad.
-                    (smsTemplate?.body?.length ?: 0) > 350 ->
-                        ValidationResult.Invalid("The SMS body should not exceed 350 characters.")
+                    // Validering for SMS body-lengde. Tekstlengde over 268 vil telle som tre SMS-er og transaksjoner.
+                    (smsTemplate?.body?.length ?: 0) > 268 ->
+                        ValidationResult.Invalid("The SMS body should not exceed 268 characters.")
 
                     else -> ValidationResult.Valid
                 }
