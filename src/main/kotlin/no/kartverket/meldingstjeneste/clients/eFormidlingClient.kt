@@ -28,10 +28,12 @@ class EFormidlingClient {
     private val client =
         HttpClient {
             install(ContentNegotiation) {
-                json(Json {
-                    explicitNulls = false
-                    encodeDefaults = true
-                })
+                json(
+                    Json {
+                        explicitNulls = false
+                        encodeDefaults = true
+                    },
+                )
             }
         }
 
@@ -50,21 +52,23 @@ class EFormidlingClient {
             Capability(
                 process = cap.process,
                 serviceIdentifier = cap.serviceIdentifier,
-                documentTypes = cap.documentTypes.map { doc ->
-                    DocumentType.fromString(doc.type.name, doc.standard)
-                },
+                documentTypes =
+                    cap.documentTypes.map { doc ->
+                        DocumentType.fromString(doc.type.name, doc.standard)
+                    },
                 digitalPostAddress = cap.digitalPostAddress,
                 postAddress = cap.postAddress,
-                returnAddress = cap.returnAddress
+                returnAddress = cap.returnAddress,
             )
         }
     }
 
     suspend fun createMessage(sbd: StandardBusinessDocument): EFormidlingMeldingId {
-        val res = client.post("$eFormidlingURL/messages/out") {
-            contentType(ContentType.Application.Json)
-            setBody(sbd)
-        }
+        val res =
+            client.post("$eFormidlingURL/messages/out") {
+                contentType(ContentType.Application.Json)
+                setBody(sbd)
+            }
         if (!res.status.isSuccess()) {
             val error = res.body<EFormidlingErrorResponse>()
             when (val exceptionType = error.exception.split('.').last()) {
@@ -78,22 +82,21 @@ class EFormidlingClient {
         return response.standardBusinessDocumentHeader.documentIdentification.instanceIdentifier!!
     }
 
-
     suspend fun uploadHtmlFile(
         eFormidlingMeldingId: EFormidlingMeldingId,
         html: ByteArray,
         filename: String,
-        attachmentName: String = filename
+        attachmentName: String = filename,
     ) {
-
-        val res = client.put("$eFormidlingURL/messages/out/$eFormidlingMeldingId") {
-            headers {
-                append(HttpHeaders.ContentDisposition, "attachment; name=\"$attachmentName\"; filename=\"$filename\"")
-                append(HttpHeaders.ContentLength, html.size.toString())
-                append(HttpHeaders.ContentType, "application/octet-stream")
+        val res =
+            client.put("$eFormidlingURL/messages/out/$eFormidlingMeldingId") {
+                headers {
+                    append(HttpHeaders.ContentDisposition, "attachment; name=\"$attachmentName\"; filename=\"$filename\"")
+                    append(HttpHeaders.ContentLength, html.size.toString())
+                    append(HttpHeaders.ContentType, "application/octet-stream")
+                }
+                setBody(html)
             }
-            setBody(html)
-        }
 
         if (!res.status.isSuccess()) {
             val msg = "Opplasting av fil feilet – ${res.status} – ${res.bodyAsText()}"
@@ -102,8 +105,6 @@ class EFormidlingClient {
             throw EFormidlingServerException(msg)
         }
     }
-
-
 
     suspend fun sendMessage(eFormidlingMeldingId: EFormidlingMeldingId): Boolean {
         val res = client.post("$eFormidlingURL/messages/out/$eFormidlingMeldingId")
@@ -115,35 +116,30 @@ class EFormidlingClient {
         }
 
         return true
-
     }
 
     suspend fun getOutgoingConversations(messageTitle: String): EFormidlingApiPayload<ConversationDTO> {
         var page = 0
         var response: EFormidlingApiPayload<ConversationDTO>
-        val content = buildList {
-            do {
-                val res = client.get("$eFormidlingURL/conversations?messageTitle=${messageTitle}&size=2000&page=${page}")
+        val content =
+            buildList {
+                do {
+                    val res = client.get("$eFormidlingURL/conversations?messageTitle=$messageTitle&size=2000&page=$page")
 
-                if (!res.status.isSuccess()) {
-                    val msg = "Kall til utgående meldinger feilet – status=${res.status} – ${res.bodyAsText()}"
-                    logger.error(msg)
-                    throw IllegalStateException(msg)
-                }
+                    if (!res.status.isSuccess()) {
+                        val msg = "Kall til utgående meldinger feilet – status=${res.status} – ${res.bodyAsText()}"
+                        logger.error(msg)
+                        throw IllegalStateException(msg)
+                    }
 
-                response = res.body<EFormidlingApiPayload<ConversationDTO>>()
-                addAll(response.content)
-                page += 1
-            } while (!response.last)
-        }
+                    response = res.body<EFormidlingApiPayload<ConversationDTO>>()
+                    addAll(response.content)
+                    page += 1
+                } while (!response.last)
+            }
 
         return EFormidlingApiPayload(content = content, last = true)
     }
-
-
-
-
-
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -159,7 +155,9 @@ data class EFormidlingErrorResponse(
     val description: String? = null,
 )
 
-enum class Meldingstatus(val status: String) {
+enum class Meldingstatus(
+    val status: String,
+) {
     OPPRETTET("OPPRETTET"),
     SENDT("SENDT"),
     MOTTATT("MOTTATT"),
@@ -169,7 +167,7 @@ enum class Meldingstatus(val status: String) {
     ANNET("ANNET"),
     INNKOMMENDE_MOTTATT("INNKOMMENDE_MOTTATT"),
     INNKOMMENDE_LEVERT("INNKOMMENDE_LEVERT"),
-    LEVETID_UTLOPT("LEVETID_UTLOPT");
+    LEVETID_UTLOPT("LEVETID_UTLOPT"),
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -197,9 +195,11 @@ data class ConversationDTO(
     val messageTitle: String,
     val processIdentifier: String,
     val messageStatuses: List<StatusDTO>,
-    val lastUpdate: String
+    val lastUpdate: String,
 )
 
-class EFormidlingServerException(message: String): Exception(message)
+class EFormidlingServerException(
+    message: String,
+) : Exception(message)
 
 typealias Fnr = String

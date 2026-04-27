@@ -49,10 +49,11 @@ class OrderService {
     private val client = HttpClientProvider.client
 
     private suspend fun postAltinnOrder(body: AltinnOrderRequest): HttpResponse {
-        val response = client.post("$NOTIFICATIONS_URL/orders") {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
+        val response =
+            client.post("$NOTIFICATIONS_URL/orders") {
+                contentType(ContentType.Application.Json)
+                setBody(body)
+            }
 
         return response
     }
@@ -184,7 +185,7 @@ class OrderService {
         recipients: List<Recipient>,
         requestedSendTime: ZonedDateTime,
     ): OrderConfirmation {
-        val statusLink =  "orders/$orderId"
+        val statusLink = "orders/$orderId"
 
         val orderStatus: OrderStatus =
             if (checkIfDateIsLaterThanNow(requestedSendTime.toString())) {
@@ -273,11 +274,15 @@ class OrderService {
     private fun AltinnOrderStatusResponse.toOrderStatus(notificationStatus: List<Notification>?): OrderStatus =
         when {
             processingStatus.status == "Cancelled" -> OrderStatus.Cancelled
+
             checkIfDateIsLaterThanNow(requestedSendTime) -> OrderStatus.Scheduled
+
             notificationStatus?.isEmpty() == true -> OrderStatus.Processing
+
             notificationStatus?.all {
                 it.status == NotificationStatus.Failed.toString() || it.status == NotificationStatus.NotIdentified.toString()
             } == true -> OrderStatus.Failed
+
             notificationStatus?.all {
                 it.status in
                     listOf(
@@ -286,6 +291,7 @@ class OrderService {
                         NotificationStatus.NotIdentified.toString(),
                     )
             } == true -> OrderStatus.Completed
+
             else -> OrderStatus.Processing
         }
 
@@ -299,15 +305,31 @@ class OrderService {
     private suspend fun checkForException(responses: List<HttpResponse>) {
         responses.forEach { response ->
             when (response.status) {
-                HttpStatusCode.BadRequest -> throw BadRequestException(response.bodyAsText())
-                HttpStatusCode.Unauthorized -> throw UnauthorizedException(response.bodyAsText())
-                HttpStatusCode.Forbidden -> throw ForbiddenException(response.bodyAsText())
-                HttpStatusCode.NotFound -> throw NotFoundException(message = response.bodyAsText())
-                HttpStatusCode.InternalServerError -> throw Exception(response.bodyAsText())
-                else ->
+                HttpStatusCode.BadRequest -> {
+                    throw BadRequestException(response.bodyAsText())
+                }
+
+                HttpStatusCode.Unauthorized -> {
+                    throw UnauthorizedException(response.bodyAsText())
+                }
+
+                HttpStatusCode.Forbidden -> {
+                    throw ForbiddenException(response.bodyAsText())
+                }
+
+                HttpStatusCode.NotFound -> {
+                    throw NotFoundException(message = response.bodyAsText())
+                }
+
+                HttpStatusCode.InternalServerError -> {
+                    throw Exception(response.bodyAsText())
+                }
+
+                else -> {
                     if (!response.status.isSuccess()) {
                         throw Exception("Unhandled error: ${response.status.value} - ${response.bodyAsText()}")
                     }
+                }
             }
         }
     }
@@ -402,23 +424,28 @@ class OrderService {
         type: String? = null,
     ): List<AltinnOrderResponse>? =
         when (type) {
-            "active" ->
+            "active" -> {
                 orders
                     ?.filter { !checkIfDateIsLaterThanNow(it.requestedSendTime) }
                     ?.sortedByDescending { order ->
                         ZonedDateTime.parse(order.requestedSendTime)
                     }
-            "planned" ->
+            }
+
+            "planned" -> {
                 orders
                     ?.filter { checkIfDateIsLaterThanNow(it.requestedSendTime) }
                     ?.sortedBy { order ->
                         ZonedDateTime.parse(order.requestedSendTime)
                     }
-            else ->
+            }
+
+            else -> {
                 orders
                     ?.sortedByDescending { order ->
                         ZonedDateTime.parse(order.requestedSendTime)
                     }
+            }
         }
 
     private fun checkIfDateIsLaterThanNow(date: String): Boolean = ZonedDateTime.parse(date).isAfter(ZonedDateTime.now().plusMinutes(5))

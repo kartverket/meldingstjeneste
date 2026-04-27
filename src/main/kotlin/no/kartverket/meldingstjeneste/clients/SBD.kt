@@ -4,57 +4,59 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
-import java.util.UUID
 import no.kartverket.meldingstjeneste.SENDER_REF_ID
-
+import java.util.UUID
 
 fun createStandardBusinessDocument(
     mottaker: FysiskPerson,
-    capability: Capability
+    capability: Capability,
 ): StandardBusinessDocument {
+    val documentType =
+        capability.documentTypes.firstOrNull()
+            ?: error("Ingen dokumenttyper tilgjengelig for mottaker")
 
-
-
-    val documentType = capability.documentTypes.firstOrNull()
-        ?: error("Ingen dokumenttyper tilgjengelig for mottaker")
-
-    val header = StandardBusinessDocumentHeader(
-        receiver = listOf(
-            Ident(
-                identifier = Identifier(
-                    value = mottaker.identifikator
-                )
-            )
-        ),
-        documentIdentification = DocumentIdentification(
-            type = documentType.type,
-            standard = documentType.standard,
-            instanceIdentifier = UUID.randomUUID().toString(),
-
-            ),
-        businessScope = Scope(
-            listOf(
-                Conversation(identifier = mottaker.prosessType),
-                SenderRef(
-                    instanceIdentifier = SENDER_REF_ID,
-                )
-            )
+    val header =
+        StandardBusinessDocumentHeader(
+            receiver =
+                listOf(
+                    Ident(
+                        identifier =
+                            Identifier(
+                                value = mottaker.identifikator,
+                            ),
+                    ),
+                ),
+            documentIdentification =
+                DocumentIdentification(
+                    type = documentType.type,
+                    standard = documentType.standard,
+                    instanceIdentifier = UUID.randomUUID().toString(),
+                ),
+            businessScope =
+                Scope(
+                    listOf(
+                        Conversation(identifier = mottaker.prosessType),
+                        SenderRef(
+                            instanceIdentifier = SENDER_REF_ID,
+                        ),
+                    ),
+                ),
         )
-    )
 
-
-       return StandardBusinessDocument(
-            standardBusinessDocumentHeader = header,
-            digital = DigitalPostPayload(
+    return StandardBusinessDocument(
+        standardBusinessDocumentHeader = header,
+        digital =
+            DigitalPostPayload(
                 sikkerhetsnivaa = 3,
                 hoveddokument = "varsel.html",
                 tittel = "Melding om egenregistrering", // Endrer du denne tittelen vil det får konsekvenser for eFormidlingClient.getOutgoingConversations()
-                digitalPostInfo = DigitalPostInfo(
-                    virkningsdato = "2025-01-01",
-                    aapningskvittering = true
-                )
-            )
-        )
+                digitalPostInfo =
+                    DigitalPostInfo(
+                        virkningsdato = "2025-01-01",
+                        aapningskvittering = true,
+                    ),
+            ),
+    )
 }
 
 /**
@@ -62,10 +64,10 @@ fun createStandardBusinessDocument(
  * https://docs.digdir.no/docs/eFormidling/Utvikling/Dokumenttyper/standard_sbd
  */
 @Serializable()
-data class StandardBusinessDocument (
+data class StandardBusinessDocument(
     val standardBusinessDocumentHeader: StandardBusinessDocumentHeader,
     val digital: DigitalPostPayload,
-    )
+)
 
 @Serializable
 data class StandardBusinessDocumentHeader(
