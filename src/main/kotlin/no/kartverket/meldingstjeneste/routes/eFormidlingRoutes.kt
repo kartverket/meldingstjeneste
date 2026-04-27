@@ -16,16 +16,17 @@ import no.kartverket.meldingstjeneste.logger
 import no.kartverket.meldingstjeneste.service.EFormidlingService
 import no.kartverket.meldingstjeneste.service.MissingDigitalCapabilitiesException
 
-
 fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
     post("/eFormidling/send/bulk", sendBulkDoc) {
         val (tittel, melding, identifikatorer) = call.receive<MeldingBulkDTO>()
 
-        val mottakere = identifikatorer.map { id ->
-            FysiskPerson(
-                identifikator = id
-            )
-        }.toSet()
+        val mottakere =
+            identifikatorer
+                .map { id ->
+                    FysiskPerson(
+                        identifikator = id,
+                    )
+                }.toSet()
 
         logger.info("Sender melding til eFormidling for ${mottakere.size} mottakere")
 
@@ -38,16 +39,13 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
                     if (ok) {
                         antallSendt++
                     }
-
                 } catch (e: Exception) {
                     logger.error("Kunne ikke sende melding", e)
                     throw e
                 }
-
             }
             logger.info("Sendte $antallSendt av ${mottakere.size} meldinger")
         }
-
 
         logger.info("Startet med å sende meldinger til eFormidling")
         call.respond("Sender meldinger")
@@ -56,34 +54,44 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
     post("/eFormidling/send/single", sendEnDoc) {
         val (tittel, melding, identifikator) = call.receive<MeldingSingleDTO>()
 
-        val fysiskPerson = FysiskPerson(
-            identifikator = identifikator
-        )
+        val fysiskPerson =
+            FysiskPerson(
+                identifikator = identifikator,
+            )
 
         try {
             eFormidlingService.sendMelding(fysiskPerson, tittel, melding)
             call.respond(HttpStatusCode.OK)
-        }
-
-        catch (e: Exception) {
-
+        } catch (e: Exception) {
             when (e) {
                 is MissingDigitalCapabilitiesException -> {
                     logger.info("Mottaker har ikke digital capability, sender ikke melding til eFormidling")
-                    call.respond(HttpStatusCode.BadRequest, APIErrorResponse(APIErrorType.MOTTAKER_MANGLER_DIGITAL_CAPABILITY,"Bruker mangler digitial capability: ${e.message}"))
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        APIErrorResponse(
+                            APIErrorType.MOTTAKER_MANGLER_DIGITAL_CAPABILITY,
+                            "Bruker mangler digitial capability: ${e.message}",
+                        ),
+                    )
                 }
 
                 is IllegalArgumentException -> {
                     logger.error("Feil ved sending til eFormidling: ${e.message}", e)
-                    call.respond(HttpStatusCode.BadRequest, APIErrorResponse(APIErrorType.KLIENT_FEIL, "Feil ved sending til eFormidling: ${e.message}"))
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        APIErrorResponse(APIErrorType.KLIENT_FEIL, "Feil ved sending til eFormidling: ${e.message}"),
+                    )
                 }
 
                 else -> {
                     logger.error("Uventet feil ved sending til eFormidling", e)
-                    call.respond(HttpStatusCode.InternalServerError, APIErrorResponse(APIErrorType.SERVER_FEIL, "Uventet feil ved sending til eFormidling"))}
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        APIErrorResponse(APIErrorType.SERVER_FEIL, "Uventet feil ved sending til eFormidling"),
+                    )
+                }
             }
         }
-
     }
 
     get("/eFormidling/result", resultDoc) {
@@ -96,8 +104,11 @@ fun Route.eFormidlingroutes(eFormidlingService: EFormidlingService) {
     get("/eFormidling/result/fnr", resultFnrDoc) {
         val params = call.request.queryParameters
         val datolevert = params["dato"]!!
-        val vellykkedeutsendinger = eFormidlingService.hentMottakereMedVellykketLevering(datolevert)
-            .map { conversationDTO -> conversationDTO.receiver }.toSet()
+        val vellykkedeutsendinger =
+            eFormidlingService
+                .hentMottakereMedVellykketLevering(datolevert)
+                .map { conversationDTO -> conversationDTO.receiver }
+                .toSet()
 
         call.respond(vellykkedeutsendinger)
     }
@@ -124,7 +135,7 @@ data class APIErrorResponse(
 )
 
 @Serializable
-enum class APIErrorType() {
+enum class APIErrorType {
     SERVER_FEIL,
     KLIENT_FEIL,
     MOTTAKER_MANGLER_DIGITAL_CAPABILITY,
@@ -135,15 +146,16 @@ private val sendBulkDoc: RouteConfig.() -> Unit = {
     summary = "Send en enkelt melding til flere mottakere"
     description = ""
     request {
-        body <MeldingBulkDTO> {
+        body<MeldingBulkDTO> {
             description = "Melding som skal sendes, pluss en liste med personnummer til mottakerne"
             required = true
             example("Enkel melding") {
-                value = MeldingBulkDTO(
-                    tittel = "God dag!",
-                    melding = "Hei! Håper du har en fin dag i dag. Mvh Kartverket",
-                    identifikatorer = listOf("12345678910", "0123456789"),
-                )
+                value =
+                    MeldingBulkDTO(
+                        tittel = "God dag!",
+                        melding = "Hei! Håper du har en fin dag i dag. Mvh Kartverket",
+                        identifikatorer = listOf("12345678910", "0123456789"),
+                    )
             }
         }
     }
@@ -168,15 +180,16 @@ private val sendEnDoc: RouteConfig.() -> Unit = {
     summary = "Send en enkelt melding til en enkelt mottaker"
     description = ""
     request {
-        body <MeldingSingleDTO> {
+        body<MeldingSingleDTO> {
             description = "Melding som skal sendes, pluss personnummer til mottaker"
             required = true
             example("Enkel melding") {
-                value = MeldingSingleDTO(
-                    tittel = "God dag!",
-                    melding = "Hei! Håper du har en fin dag i dag. Mvh Kartverket",
-                    identifikator = "12345678910",
-                )
+                value =
+                    MeldingSingleDTO(
+                        tittel = "God dag!",
+                        melding = "Hei! Håper du har en fin dag i dag. Mvh Kartverket",
+                        identifikator = "12345678910",
+                    )
             }
         }
     }

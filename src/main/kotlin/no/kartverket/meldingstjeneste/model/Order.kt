@@ -85,13 +85,13 @@ data class OrderRequest(
 
 @Serializable
 data class SmsTemplate(
-    val body: String
+    val body: String,
 )
 
 @Serializable
 data class EmailTemplate(
     val body: String,
-    val subject: String
+    val subject: String,
 )
 
 @Serializable

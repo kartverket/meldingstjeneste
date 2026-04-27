@@ -12,8 +12,8 @@ import no.kartverket.meldingstjeneste.auth.AuthConfig
 import no.kartverket.meldingstjeneste.routes.authConfigRoute
 import no.kartverket.meldingstjeneste.routes.eFormidlingroutes
 import no.kartverket.meldingstjeneste.routes.orderRoutes
-import no.kartverket.meldingstjeneste.service.OrderService
 import no.kartverket.meldingstjeneste.service.EFormidlingService
+import no.kartverket.meldingstjeneste.service.OrderService
 
 fun Application.configureRouting(
     orderService: OrderService,

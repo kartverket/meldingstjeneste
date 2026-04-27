@@ -1,15 +1,14 @@
 package no.kartverket.meldingstjeneste.clients
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.SerialName
 import java.util.Locale
-
 
 @Serializable
 data class Capabilities(
@@ -32,12 +31,16 @@ data class DocumentType(
     val standard: String? = null,
 ) {
     companion object {
-        fun fromString(type: String, standard: String? = null): DocumentType {
-            val docTypeStandard = try {
-                DocumentTypeStandard.valueOf(type.uppercase(Locale.getDefault()))
-            } catch (_: IllegalArgumentException) {
-                DocumentTypeStandard.UNSUPPORTED
-            }
+        fun fromString(
+            type: String,
+            standard: String? = null,
+        ): DocumentType {
+            val docTypeStandard =
+                try {
+                    DocumentTypeStandard.valueOf(type.uppercase(Locale.getDefault()))
+                } catch (_: IllegalArgumentException) {
+                    DocumentTypeStandard.UNSUPPORTED
+                }
             return DocumentType(type = docTypeStandard, standard = standard)
         }
     }
@@ -69,18 +72,20 @@ object DocumentTypeStandardSerializer : KSerializer<DocumentTypeStandard> {
         } ?: DocumentTypeStandard.UNSUPPORTED
     }
 
-    override fun serialize(encoder: Encoder, value: DocumentTypeStandard) {
-        val stringValue = when(value) {
-            DocumentTypeStandard.PRINT -> "print"
-            DocumentTypeStandard.DIGITAL -> "digital"
-            DocumentTypeStandard.ARKIVMELDING -> "arkivmelding"
-            DocumentTypeStandard.UNSUPPORTED -> "unsupported"
-        }
+    override fun serialize(
+        encoder: Encoder,
+        value: DocumentTypeStandard,
+    ) {
+        val stringValue =
+            when (value) {
+                DocumentTypeStandard.PRINT -> "print"
+                DocumentTypeStandard.DIGITAL -> "digital"
+                DocumentTypeStandard.ARKIVMELDING -> "arkivmelding"
+                DocumentTypeStandard.UNSUPPORTED -> "unsupported"
+            }
         encoder.encodeString(stringValue)
     }
 }
-
-
 
 @Serializable
 data class DigitalPostAddress(

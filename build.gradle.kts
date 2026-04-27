@@ -8,7 +8,6 @@ plugins {
     id("io.ktor.plugin") version "3.4.2"
 }
 
-
 group = "no.kartverket.meldingstjeneste"
 version = "0.0.1"
 

@@ -32,7 +32,6 @@ import java.util.Base64
 import java.util.Date
 import java.util.UUID
 
-
 class TokenService {
     val logger: Logger = LoggerFactory.getLogger(TokenService::class.java)
 
@@ -100,7 +99,9 @@ class TokenService {
                 }
 
             if (!response.status.isSuccess()) {
-                throw Exception("Failed to get access token from token exchange with Altinn - ${response.status.value} - ${response.bodyAsText()}")
+                throw Exception(
+                    "Failed to get access token from token exchange with Altinn - ${response.status.value} - ${response.bodyAsText()}",
+                )
             }
 
             val altinnToken = response.body<String>()
@@ -128,19 +129,22 @@ class TokenService {
                 claimValue = "altinn:serviceowner/notifications.create"
             }
 
-            else -> throw IllegalArgumentException("Invalid type: $apiProvider")
+            else -> {
+                throw IllegalArgumentException("Invalid type: $apiProvider")
+            }
         }
 
         if (clientId.isBlank() || jwkJson.isBlank()) {
             throw NullPointerException("Client Id or JWK must be set in environment variables")
         }
 
-        val jwk: Jwk = try {
-            Json.decodeFromString(jwkJson)
-        } catch (e: Exception) {
-            logger.error("Failed to parse JWK JSON: $jwkJson", e)
-            throw IllegalArgumentException("Failed to parse JWK JSON: $jwkJson")
-        }
+        val jwk: Jwk =
+            try {
+                Json.decodeFromString(jwkJson)
+            } catch (e: Exception) {
+                logger.error("Failed to parse JWK JSON: $jwkJson", e)
+                throw IllegalArgumentException("Failed to parse JWK JSON: $jwkJson")
+            }
 
         val modulus = jwk.n
         val privateExponent = jwk.d
@@ -162,8 +166,7 @@ class TokenService {
                 .withClaim(
                     "scope",
                     claimValue,
-                )
-                .withKeyId(jwk.kid)
+                ).withKeyId(jwk.kid)
                 .withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(Date(System.currentTimeMillis() + 2 * 60 * 1000)) // 2 minutes expiry
                 .sign(algorithm)

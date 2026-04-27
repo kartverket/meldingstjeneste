@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit
 const val AUTH_JWT = "auth-jwt"
 
 fun Application.configureAuth(authConfig: AuthConfig) {
-
     val jwkProvider =
         JwkProviderBuilder(URI(authConfig.jwksUri).toURL())
             .cached(10, 24, TimeUnit.HOURS)
@@ -38,6 +37,11 @@ fun Application.configureAuth(authConfig: AuthConfig) {
 }
 
 fun ApplicationCall.getUserId(): String? {
-    val userid = this.principal<JWTPrincipal>()?.payload?.getClaim("oid")?.asString() ?: return null
+    val userid =
+        this
+            .principal<JWTPrincipal>()
+            ?.payload
+            ?.getClaim("oid")
+            ?.asString() ?: return null
     return userid
 }

@@ -11,34 +11,36 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.kartverket.meldingstjeneste.logger
 
-
 object HttpClientProvider {
-    val client = HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    encodeDefaults = false
-                    ignoreUnknownKeys = true
-                },
-            )
-        }
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val accessToken = runBlocking {
-                        TokenService().getAccessToken()
+    val client =
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        encodeDefaults = false
+                        ignoreUnknownKeys = true
+                    },
+                )
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val accessToken =
+                            runBlocking {
+                                TokenService().getAccessToken()
+                            }
+                        logger.info("Setting access token for client")
+                        BearerTokens(accessToken, "")
                     }
-                    logger.info("Setting access token for client")
-                    BearerTokens(accessToken, "")
-                }
-                refreshTokens {
-                    val accessToken = runBlocking {
-                        TokenService().getAccessToken()
+                    refreshTokens {
+                        val accessToken =
+                            runBlocking {
+                                TokenService().getAccessToken()
+                            }
+                        logger.info("Fetching new access token due to 401 from Altinn")
+                        BearerTokens(accessToken, "")
                     }
-                    logger.info("Fetching new access token due to 401 from Altinn")
-                    BearerTokens(accessToken, "")
                 }
             }
         }
-    }
 }
