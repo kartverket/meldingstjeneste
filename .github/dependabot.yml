@@ -24,3 +24,8 @@ updates:
       ktor-swagger:
         patterns:
           - "io.github.smiley4:ktor*"
+      patch-dependencies:
+        patterns:
+          - "*"
+        update-types:
+            - "patch"
