@@ -58,12 +58,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.registry }}/${{ github.repository }}:${{ steps.tag_version.outputs.new_tag }},${{ env.registry }}/${{ github.repository }}:latest
+          tags: ${{ env.registry }}/${{ github.repository }}:${{ steps.tag_version.outputs.new_tag }}
 
       - name: Set output with build values
         id: setOutput
         run: |
-          echo "image_url=${{ env.registry }}/${{ github.repository }}@${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
+          echo "image_url=${{ env.registry }}/${{ github.repository }}:${{ steps.tag_version.outputs.new_tag }}@${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
 
   pharos:
     name: Run Pharos with Required Permissions
