@@ -52,7 +52,7 @@ dependencies {
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:1.16.5")
     // Entra-ID authentication
-    implementation("com.microsoft.graph:microsoft-graph:6.62.0")
+    implementation("com.microsoft.graph:microsoft-graph:6.63.0")
     implementation("com.azure:azure-identity:1.18.2")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
