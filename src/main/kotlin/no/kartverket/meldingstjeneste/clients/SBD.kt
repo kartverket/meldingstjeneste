@@ -1,11 +1,11 @@
 package no.kartverket.meldingstjeneste.clients
 
+import java.util.UUID
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import no.kartverket.meldingstjeneste.SENDER_REF_ID
-import java.util.UUID
 
 fun createStandardBusinessDocument(
     mottaker: FysiskPerson,
@@ -53,7 +53,7 @@ fun createStandardBusinessDocument(
                 digitalPostInfo =
                     DigitalPostInfo(
                         virkningsdato = "2025-01-01",
-                        aapningskvittering = true,
+                        aapningskvittering = false,
                     ),
             ),
     )
