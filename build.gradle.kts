@@ -53,7 +53,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.16.5")
     // Entra-ID authentication
     implementation("com.microsoft.graph:microsoft-graph:6.63.0")
-    implementation("com.azure:azure-identity:1.18.2")
+    implementation("com.azure:azure-identity:1.18.3")
 
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.3.21")
