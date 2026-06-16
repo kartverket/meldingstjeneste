@@ -4,10 +4,9 @@ plugins {
     val kotlinVersion = "2.3.21"
 
     kotlin("jvm") version kotlinVersion
-    id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
     id("io.ktor.plugin") version "3.5.0"
 }
-
 
 group = "no.kartverket.meldingstjeneste"
 version = "0.0.1"
@@ -46,14 +45,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.5.34")
-    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.17.0")
-    // Entra-ID authentication
-    implementation("com.microsoft.graph:microsoft-graph:6.65.0")
-    implementation("com.azure:azure-identity:1.18.3")
 
     // Klient
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -75,11 +68,9 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
     // Entra-ID autentisering
-    implementation("com.microsoft.graph:microsoft-graph:6.62.0")
-    implementation("com.azure:azure-identity:1.18.2")
+    implementation("com.microsoft.graph:microsoft-graph:6.65.0")
+    implementation("com.azure:azure-identity:1.18.3")
 
-    testImplementation("io.ktor:ktor-server-test-host-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.4.0")
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.3.21")
