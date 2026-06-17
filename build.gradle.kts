@@ -69,7 +69,7 @@ dependencies {
 
     // Entra-ID autentisering
     implementation("com.microsoft.graph:microsoft-graph:6.65.0")
-    implementation("com.azure:azure-identity:1.18.3")
+    implementation("com.azure:azure-identity:1.18.4")
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
