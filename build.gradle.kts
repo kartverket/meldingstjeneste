@@ -1,11 +1,11 @@
-val ktorVersion = "3.5.0"
+val ktorVersion = "3.5.1"
 
 plugins {
     val kotlinVersion = "2.3.21"
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("io.ktor.plugin") version "3.5.0"
+    id("io.ktor.plugin") version "3.5.1"
 }
 
 group = "no.kartverket.meldingstjeneste"
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.35")
+    implementation("ch.qos.logback:logback-classic:1.5.37")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     // Metrics
