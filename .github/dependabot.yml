@@ -8,18 +8,21 @@ updates:
   - package-ecosystem: "github-actions"
     directory: ".github/workflows"
     schedule:
-      interval: "weekly"
+      interval: weekly
+      day: sunday
       
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
+      day: sunday
 
   - package-ecosystem: "gradle"
     # Look for build.gradle files from the `root` directory
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
+      day: sunday
     groups:
       ktor-swagger:
         patterns:
