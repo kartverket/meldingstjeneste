@@ -1,18 +1,12 @@
-FROM eclipse-temurin:25-jre-alpine-3.23@sha256:f10d6259d0798c1e12179b6bf3b63cea0d6843f7b09c9f9c9c422c50e44379ec
+FROM  dhi.io/eclipse-temurin:25-alpine3.23@sha256:3df0f4a21d9d377c68804ba5ca30893e70926fc0c70b5454dd254596b482f060
 
-RUN apk update && apk upgrade
-
-ENV USER_ID=150 \
-    USER_NAME=apprunner \
-    TZ=Europe/Oslo
-
-RUN addgroup -g ${USER_ID} ${USER_NAME} \
-    && adduser -u ${USER_ID} -G ${USER_NAME} -D ${USER_NAME}
+ENV TZ=Europe/Oslo
 
 WORKDIR /app
 
-COPY --chown=${USER_ID}:${USER_ID} /build/libs/meldingstjeneste-all.jar /app/meldingstjeneste.jar
+COPY /build/libs/meldingstjeneste-all.jar /app/meldingstjeneste.jar
 
-USER ${USER_NAME}
+USER nonroot
+
 EXPOSE 8080:8080
 ENTRYPOINT ["java", "--enable-native-access=ALL-UNNAMED", "-jar", "meldingstjeneste.jar"]

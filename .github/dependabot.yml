@@ -4,6 +4,12 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  dockerhub-hardened-images:
+    type: docker-registry
+    url: https://dhi.io
+    username: ${{ secrets.DOCKERHUB_USERNAME }}
+    password: ${{ secrets.DOCKERHUB_TOKEN }}
 updates:
   - package-ecosystem: "github-actions"
     directory: ".github/workflows"
@@ -13,6 +19,8 @@ updates:
       
   - package-ecosystem: "docker"
     directory: "/"
+    registries:
+        - dockerhub-hardened-images
     schedule:
       interval: weekly
       day: sunday
