@@ -1,4 +1,4 @@
-FROM  dhi.io/eclipse-temurin:25-alpine3.23@sha256:3df0f4a21d9d377c68804ba5ca30893e70926fc0c70b5454dd254596b482f060
+FROM  dhi.io/eclipse-temurin:26-alpine3.23@sha256:fe31cc53e56ee9dd3ca1268fca813e4bdcad663f0b87a7ab31280f5b12b08e1e
 
 ENV TZ=Europe/Oslo
 
