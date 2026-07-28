@@ -68,7 +68,7 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
     // Entra-ID autentisering
-    implementation("com.microsoft.graph:microsoft-graph:6.65.0")
+    implementation("com.microsoft.graph:microsoft-graph:6.66.1")
     implementation("com.azure:azure-identity:1.18.4")
 
     // Testing
