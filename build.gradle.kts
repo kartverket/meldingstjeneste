@@ -73,9 +73,9 @@ dependencies {
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("io.kotest:kotest-runner-junit5:6.2.1")
-    testImplementation("io.kotest:kotest-assertions-core:6.2.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.0")
+    testImplementation("io.kotest:kotest-runner-junit5:6.2.3")
+    testImplementation("io.kotest:kotest-assertions-core:6.2.3")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.10")
 }
 
 java {
