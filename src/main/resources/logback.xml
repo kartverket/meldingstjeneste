@@ -2,6 +2,16 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <decorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                <valueMask>
+                    <value>\b\d{11}\b</value>
+                    <mask>***********</mask>
+                </valueMask>
+            </decorator>
+        </encoder>
+    </appender>
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
