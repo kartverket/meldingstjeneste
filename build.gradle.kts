@@ -67,10 +67,6 @@ dependencies {
     // Div
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
-    // Entra-ID autentisering
-    implementation("com.microsoft.graph:microsoft-graph:6.66.1")
-    implementation("com.azure:azure-identity:1.18.5")
-
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
