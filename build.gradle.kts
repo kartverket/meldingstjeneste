@@ -76,6 +76,12 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
     testImplementation("io.kotest:kotest-assertions-core:6.2.4")
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.10")
+
+    constraints{
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.18.10"){
+            because("Patch for HIGH sårbarheter CVE-2026-54513, CVE-2026-54518 og flere MEDIUM net.logstash.logback:logstash-logback-encoder:9.0")
+        }
+    }
 }
 
 java {
