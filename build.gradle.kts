@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.37")
+    implementation("ch.qos.logback:logback-classic:1.6.3")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     // Metrics
