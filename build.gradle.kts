@@ -71,7 +71,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
     testImplementation("io.kotest:kotest-assertions-core:6.2.4")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.20")
 
     constraints{
         implementation("com.fasterxml.jackson.core:jackson-databind:2.18.10"){
