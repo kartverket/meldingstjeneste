@@ -77,6 +77,9 @@ dependencies {
         implementation("com.fasterxml.jackson.core:jackson-databind:2.22.2"){
             because("Patch for HIGH sårbarheter CVE-2026-54513, CVE-2026-54518 og flere MEDIUM net.logstash.logback:logstash-logback-encoder:9.0")
         }
+        implementation("io.netty:netty-handler:4.2.17.Final"){
+            because("CVE-2026-75595: Kristisk sårbarhet. Fikset i 4.2.17.Final. Kommer transitivt via ktor-server-netty -> netty-codec-http2 -> netty-codec-http, og overstyrer ktor-bom sin pinnede 4.2.16.Final.")
+        }
     }
 }
 
