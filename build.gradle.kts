@@ -1,7 +1,7 @@
 val ktorVersion = "3.5.2"
 
 plugins {
-    val kotlinVersion = "2.4.10"
+    val kotlinVersion = "2.4.20"
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
@@ -69,9 +69,9 @@ dependencies {
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
-    testImplementation("io.kotest:kotest-assertions-core:6.2.4")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.10")
+    testImplementation("io.kotest:kotest-runner-junit5:6.2.5")
+    testImplementation("io.kotest:kotest-assertions-core:6.2.5")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.20")
 
     constraints{
         implementation("com.fasterxml.jackson.core:jackson-databind:2.22.2"){
