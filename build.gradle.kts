@@ -1,7 +1,7 @@
 val ktorVersion = "3.5.2"
 
 plugins {
-    val kotlinVersion = "2.4.10"
+    val kotlinVersion = "2.4.20"
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
@@ -69,15 +69,15 @@ dependencies {
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("io.kotest:kotest-runner-junit5:6.2.4")
-    testImplementation("io.kotest:kotest-assertions-core:6.2.4")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.10")
+    testImplementation("io.kotest:kotest-runner-junit5:6.2.5")
+    testImplementation("io.kotest:kotest-assertions-core:6.2.5")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.20")
 
     constraints{
         implementation("com.fasterxml.jackson.core:jackson-databind:2.22.2"){
             because("Patch for HIGH sårbarheter CVE-2026-54513, CVE-2026-54518 og flere MEDIUM net.logstash.logback:logstash-logback-encoder:9.0")
         }
-        implementation("io.netty:netty-handler:4.2.17.Final"){
+        implementation("io.netty:netty-handler:4.2.18.Final"){
             because("CVE-2026-75595: Kristisk sårbarhet. Fikset i 4.2.17.Final. Kommer transitivt via ktor-server-netty -> netty-codec-http2 -> netty-codec-http, og overstyrer ktor-bom sin pinnede 4.2.16.Final.")
         }
     }
