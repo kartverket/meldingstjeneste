@@ -5,7 +5,7 @@ plugins {
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("io.ktor.plugin") version "3.5.2"
+    id("io.ktor.plugin") version "3.6.0"
 }
 
 group = "no.kartverket.meldingstjeneste"
