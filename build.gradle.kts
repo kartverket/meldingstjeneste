@@ -62,7 +62,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     // Metrics
-    implementation("io.micrometer:micrometer-registry-prometheus:1.17.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.17.2")
 
     // Div
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
@@ -74,7 +74,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.4.21")
 
     constraints{
-        implementation("com.fasterxml.jackson.core:jackson-databind:2.22.3"){
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.22.4"){
             because("Patch for HIGH sårbarheter CVE-2026-54513, CVE-2026-54518 og flere MEDIUM net.logstash.logback:logstash-logback-encoder:9.0")
         }
         implementation("io.netty:netty-handler:4.2.19.Final"){
