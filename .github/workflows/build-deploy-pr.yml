@@ -29,6 +29,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '25'
+          check-latest: 'true'
+
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
