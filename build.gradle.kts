@@ -1,4 +1,4 @@
-val ktorVersion = "3.6.0"
+val ktorVersion = "3.6.1"
 
 plugins {
     val kotlinVersion = "2.4.21"
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.6.5")
+    implementation("ch.qos.logback:logback-classic:1.6.6")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     // Metrics
