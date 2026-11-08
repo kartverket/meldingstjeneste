@@ -1,11 +1,11 @@
-val ktorVersion = "3.6.0"
+val ktorVersion = "3.6.1"
 
 plugins {
     val kotlinVersion = "2.4.21"
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("io.ktor.plugin") version "3.6.0"
+    id("io.ktor.plugin") version "3.6.1"
 }
 
 group = "no.kartverket.meldingstjeneste"
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.6.5")
+    implementation("ch.qos.logback:logback-classic:1.6.6")
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     // Metrics
@@ -77,7 +77,7 @@ dependencies {
         implementation("com.fasterxml.jackson.core:jackson-databind:2.22.4"){
             because("Patch for HIGH sårbarheter CVE-2026-54513, CVE-2026-54518 og flere MEDIUM net.logstash.logback:logstash-logback-encoder:9.0")
         }
-        implementation("io.netty:netty-handler:4.2.19.Final"){
+        implementation("io.netty:netty-handler:4.2.20.Final"){
             because("CVE-2026-75595: Kristisk sårbarhet. Fikset i 4.2.17.Final. Kommer transitivt via ktor-server-netty -> netty-codec-http2 -> netty-codec-http, og overstyrer ktor-bom sin pinnede 4.2.16.Final.")
         }
     }
